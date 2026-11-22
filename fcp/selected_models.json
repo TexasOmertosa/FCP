@@ -2,7 +2,7 @@
   "model_repo": "stardust8979/FCP-weights",
   "model_revision": "2727a680b2d45ce7cca1768ff272f4614245afd4",
   "task_repo": "stardust8979/FCP-evaluation-tasks",
-  "task_revision": "f5cd0e6c8fc662933f549033d850dc31fcd5935d",
+  "task_revision": "989949ff7deb8f3d57e34118f3ef59d985c07bd6",
   "environments": {
     "pusht": {
       "architecture": {
