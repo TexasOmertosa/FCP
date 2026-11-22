@@ -69,21 +69,6 @@ Use `--checkpoint generated.pt` with the last two commands for a locally fitted 
 
 The LIBERO native controller keys its proposal stream as `base + 1009 * query_index + 17 * elapsed`, with base 20260829 for Scene2 and 42 for Caddy. The LIBERO FCG and FGSS initialization seeds are 314159 and 314160. Their training-noise streams start at 1000220 and 1000221. The open-loop evaluation CLI defaults to seed 1209. Training checkpoints, evaluation outputs, and cache manifests record the effective seeds.
 
-### CUDA numerical settings
-
-Parameters, velocity losses, Euler states, and averages of complete draws use FP32. The table gives the upper-model forward and the prior train/Val precision. CUDA attention and TF32 settings are implemented in [`fcp/numerics.py`](fcp/numerics.py).
-
-| Environment | Upper train | Upper deploy | Upper for action-prior cache | Prior train / Val |
-|---|---|---|---|---|
-| PushT | BF16 / automatic SDPA | BF16 / efficient self, Flash cross | BF16 / efficient self, Flash cross | BF16 / BF16, Math |
-| Cube | BF16 / efficient self, Flash cross | FP32 / native MHA and SDPA | FP32 / native MHA and SDPA | FP32 / FP32, native MHA and SDPA |
-| Scene2 | BF16 / Math | FP32 / Math | BF16 / Math | BF16 / FP32, Math |
-| Caddy | BF16 / Math | BF16 / Math | BF16 / Math | BF16 / FP32, Math |
-| AntMaze | BF16 / Math | BF16 / Math | BF16 / Math | FP32 / FP32, Math |
-| FourRoom | BF16 / Flash | BF16 / Flash | BF16 / Flash | FP32 / FP32, Math |
-
-The CPU path uses FP32. Use the specified CUDA and simulator versions for comparisons with the archived GPU runs.
-
 ## Train the action prior
 
 Follow the [action-prior training guide](priors/README.md) after fitting FCG and FGSS. The prior receives fixed eight-draw subgoal targets and is fitted separately for each FCP variant.

@@ -6,11 +6,12 @@ from pathlib import Path
 import numpy as np
 
 from fcp.data import window_indices
+from fcp.splits import add_split_arguments, select_window_rows
 from priors.config import ACTION_BLOCK, ACTION_DIM, ACTION_TOKENS, HISTORY_FRAMES, LOWDIM_DIM
 from fcp.release import CONFIGS
 
 
-def prepare_rows(episodes, pairs, environment, output):
+def prepare_rows(episodes, pairs, environment, output, *, split=None, source_file=None):
     spec = CONFIGS[environment]['architecture']
     dimensions = spec['latent_dim']
     history_frames = spec['history_frames']
@@ -19,6 +20,9 @@ def prepare_rows(episodes, pairs, environment, output):
     n_frames = len(latents)
     if latents.shape != (n_frames, dimensions) or actions.shape != (n_frames, ACTION_DIM[environment]):
         raise ValueError('Incorrect frame-aligned latent or action input shape.')
+    if split is not None:
+        selected = select_window_rows(environment, split, episodes, n_frames, pairs, source_file)
+        pairs = pairs[selected]
     current, goal, episode = window_indices(n_frames, boundaries, pairs)
     if np.any(current + width > goal):
         raise ValueError('Every goal must leave ten supervised actions from the start.')
@@ -65,9 +69,13 @@ def main():
     parser.add_argument('--episodes', required=True, help='NPZ of one frozen demonstration split.')
     parser.add_argument('--pairs', required=True, help='Integer NPY array of start/goal frame pairs.')
     parser.add_argument('--output', required=True, type=Path)
+    add_split_arguments(parser)
     args = parser.parse_args()
+    if args.source_file and args.split is None:
+        parser.error('--source-file requires --split.')
     with np.load(args.episodes, allow_pickle=False) as episodes:
-        prepare_rows(episodes, np.load(args.pairs, allow_pickle=False), args.environment, args.output)
+        prepare_rows(episodes, np.load(args.pairs, allow_pickle=False), args.environment, args.output,
+                     split=args.split, source_file=args.source_file)
 
 
 if __name__ == '__main__':

@@ -224,10 +224,13 @@ def run_chunk(solver, scaler, dataset, tasks, offset):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    protocol = CONFIGS['cube']['protocol']
     parser.add_argument('--variant', required=True, choices=('true', 'generated'))
     parser.add_argument('--dataset', required=True, type=Path, help='Original cube_single_expert.h5.')
-    parser.add_argument('--horizon', type=int, choices=CONFIGS['cube']['protocol']['segmented_horizons'], required=True)
-    parser.add_argument('--seed', type=int, choices=CONFIGS['cube']['protocol']['evaluation_seeds'], required=True)
+    parser.add_argument('--horizon', type=int, choices=protocol['segmented_horizons'], required=True)
+    evaluation_seeds = protocol['evaluation_seeds']
+    parser.add_argument('--seed', type=int, choices=evaluation_seeds, default=evaluation_seeds[0],
+                        help='Published evaluation group. Default: %(default)s.')
     parser.add_argument('--chunk', type=int, choices=range(10), help='Evaluate one original ten-task batch.')
     source = parser.add_mutually_exclusive_group()
     source.add_argument('--weights-root', type=Path)
