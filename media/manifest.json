@@ -1,12 +1,16 @@
 {
   "pusht_full": {
-    "task": 193,
-    "first_success_step": 110,
-    "first_success_frame_index": 220,
-    "frames": 321,
+    "task": 110,
+    "seed": 42,
+    "episode_id": 4678,
+    "first_success_step": 174,
+    "first_success_frame_index": 348,
+    "frames": 449,
     "fps": 20,
     "frames_after_success": 100,
-    "video_sha256": "d238ac3a0ae4a7c2e358933a729fb55d2c4f977374006d8845cd71e6b8fb23cc"
+    "video_sha256": "b6acef4634ffb61bb41f9fb6509117fe3eb7cc94deda400e368df940c16ce0fd",
+    "gif_sha256": "a5888c0b5865b9782ff14cd975cf43936095eb288c8b091c570cc01d960c5e84",
+    "display_goal_block_overlap": 0.9486298265686962
   },
   "antmaze_D3": {
     "task": 6,
