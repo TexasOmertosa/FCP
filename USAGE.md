@@ -116,7 +116,14 @@ An A100 rerun of both full440 variants reproduced all 880 archived first-hit rec
 
 ## Native Cube and LIBERO evaluation
 
-Extract the linked demonstration archives and use the corresponding simulator packages in [`requirements.txt`](requirements.txt). For Cube, run each horizon (25, 50, 75, 100, 125, 150) with each evaluation seed (22, 32, 42) and variant.
+Use a separate Python 3.10 environment for each simulator. The native Cube and LIBERO runners were checked on an A100 with PyTorch 2.13.0 and CUDA 13.0. Extract the [evaluation data](ASSETS.md#original-demonstrations-and-benchmark-tasks) first.
+
+```bash
+# Run in the Cube environment.
+sed -n 's/^# cube: //p' requirements.txt | xargs python -m pip install -r requirements.txt
+```
+
+For Cube, run each horizon (25, 50, 75, 100, 125, 150) with each evaluation seed (22, 32, 42) and variant.
 
 ```bash
 python -m fcp.closed_loop.cube --variant true --horizon 25 --seed 22 \
@@ -125,12 +132,19 @@ python -m fcp.closed_loop.cube --variant true --horizon 25 --seed 22 \
 
 Each Cube cell evaluates 100 fixed tasks in ten-task batches. Use `--chunk 0` to check the first ten tasks. The cell counts native zero-step successes and uses an action budget of `2H`. The last 30 actions target the final observation. The last search plans a ten-action segment. [Fixed Cube task manifest](fcp/closed_loop/cube_tasks.json)
 
-For LIBERO, use the extracted suite evaluation directory containing `episodes/` and local SAGE and LIBERO source checkouts. The runner uses the pinned SAGE lower model and applies the recorded per-query OpenBLAS kernel and reset seeds. For EGL, set `MUJOCO_EGL_DEVICE_ID` to the physical rendering device when restricting CUDA visibility. Keep the LIBERO runtime separate from PushT and Cube so that Transformers and MuJoCo match the recorded versions.
+For LIBERO, use the extracted suite evaluation directory containing `episodes/`. Use the SAGE and LIBERO source revisions below. The runner uses the pinned SAGE lower model and applies the recorded per-query OpenBLAS kernel and reset seeds. Set `MUJOCO_EGL_DEVICE_ID` to the physical rendering device when restricting CUDA visibility.
 
 ```bash
+# Run in the LIBERO environment.
+sed -n 's/^# libero: //p' requirements.txt | xargs python -m pip install -r requirements.txt
+git clone https://github.com/PKU-ML/SAGE.git
+git -C SAGE checkout fbdb018489e2cdf27f0a8ad692746db4be596b6e
+git clone https://github.com/Lifelong-Robot-Learning/LIBERO.git
+git -C LIBERO checkout 8f1084e3132a39270c3a13ebe37270a43ece2a01
+
 python -m fcp.closed_loop.libero --environment scene2 --variant true \
-  --dataset /path/to/libero_scene2_evaluation --sage-root /path/to/SAGE \
-  --libero-root /path/to/LIBERO --output runs/scene2_true.json
+  --dataset /path/to/libero_scene2_evaluation --sage-root ./SAGE \
+  --libero-root ./LIBERO --output runs/scene2_true.json
 ```
 
 Use `--environment caddy` with the Caddy archive. Use `--trials 1` to check one query. At each decision the matched prior proposes 64 plans, including its top mode. The frozen two-view lower model scores the plans once. Native success stops execution immediately. The 150-query summaries report success and the sample standard deviation over three groups of 50. The native PushT, Cube, and LIBERO commands take `--checkpoint` and `--prior-root` to evaluate a locally trained pair and its matching prior. [Fixed Scene2 and Caddy query manifests](fcp/closed_loop/libero_tasks.json)
