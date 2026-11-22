@@ -1,0 +1,310 @@
+{
+  "model_repo": "stardust8979/FCP-weights",
+  "model_revision": "620730a88a4ba8d51d507de9ba8395fd1b3651fd",
+  "task_repo": "stardust8979/FCP-evaluation-tasks",
+  "task_revision": "fc79769345d21add93ab75ef509b42ba390b1df0",
+  "environments": {
+    "pusht": {
+      "architecture": {
+        "latent_dim": 192,
+        "history_frames": 1,
+        "views": 1,
+        "future_nodes": 3,
+        "width": 512,
+        "depth": 6,
+        "heads": 8,
+        "ffn_width": 2048,
+        "euler_steps": 8
+      },
+      "variants": {
+        "true": {
+          "fcg_epoch": 191,
+          "fgss_epoch": 139,
+          "source_checkpoint_sha256": "6b596afe01666906c8c51cdcb057e6f1582cb70a430a75aa08243d7235e2719b",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_true.safetensors"
+        },
+        "generated": {
+          "fcg_epoch": 191,
+          "fgss_epoch": 280,
+          "source_checkpoint_sha256": "89cc7960f60a04b3d468a6f62514b0d3a50579b05d7553059e8d9641902af575",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_generated.safetensors"
+        }
+      },
+      "shared_fcg": true,
+      "attention_padding_mask": false,
+      "main_table_complete_draws": 8,
+      "protocol": {
+        "name": "PushT",
+        "optimizer": "cem",
+        "candidates": 300,
+        "elites": 30,
+        "search_iterations": 30,
+        "final_segment": 5,
+        "full_action_budget": 300,
+        "segmented_horizons": [
+          25,
+          50,
+          75,
+          100,
+          125,
+          150
+        ],
+        "evaluation_seeds": [
+          22,
+          32,
+          42
+        ],
+        "full_evaluation_seed": 42,
+        "training_seed": 148,
+        "generated_epochs": 300,
+        "segment": 10,
+        "terminal_goal_steps": 30
+      }
+    },
+    "cube": {
+      "architecture": {
+        "latent_dim": 192,
+        "history_frames": 1,
+        "views": 1,
+        "future_nodes": 3,
+        "width": 512,
+        "depth": 6,
+        "heads": 8,
+        "ffn_width": 2048,
+        "euler_steps": 8
+      },
+      "variants": {
+        "true": {
+          "fcg_epoch": 163,
+          "fgss_epoch": 114,
+          "source_checkpoint_sha256": "975de7cc605e635a968741c3906f5b9a65e3b09fa064488fde21d6bfcef3994a",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_true.safetensors"
+        },
+        "generated": {
+          "fcg_epoch": 163,
+          "fgss_epoch": 78,
+          "source_checkpoint_sha256": "835d120838595272ab84cbda5a31dd4563bc8b90de9ddeb633f5ba17bc673868",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_generated.safetensors"
+        }
+      },
+      "shared_fcg": true,
+      "attention_padding_mask": false,
+      "main_table_complete_draws": 8,
+      "protocol": {
+        "name": "Cube",
+        "optimizer": "cem",
+        "candidates": 300,
+        "elites": 30,
+        "search_iterations": 30,
+        "final_segment": 10,
+        "segmented_horizons": [
+          25,
+          50,
+          75,
+          100,
+          125,
+          150
+        ],
+        "evaluation_seeds": [
+          22,
+          32,
+          42
+        ],
+        "training_seed": 148,
+        "segment": 10,
+        "terminal_goal_steps": 30
+      }
+    },
+    "scene2": {
+      "architecture": {
+        "latent_dim": 768,
+        "history_frames": 3,
+        "views": 2,
+        "future_nodes": 3,
+        "width": 512,
+        "depth": 6,
+        "heads": 8,
+        "ffn_width": 2048,
+        "euler_steps": 8
+      },
+      "variants": {
+        "true": {
+          "fcg_epoch": 187,
+          "fgss_epoch": 198,
+          "source_checkpoint_sha256": "015c4f13c6a6b20a77b2f3cb1a0c4347fe6f2bfe9f83c8a61bdcb77ca53d0888",
+          "fcg_source_checkpoint_sha256": "2765349fed9fa3ccc0a3139b5158a9326dbd8682d7c0df2808951c0cac0b12e2",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_true.safetensors"
+        },
+        "generated": {
+          "fcg_epoch": 187,
+          "fgss_epoch": 185,
+          "source_checkpoint_sha256": "2765349fed9fa3ccc0a3139b5158a9326dbd8682d7c0df2808951c0cac0b12e2",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_generated.safetensors"
+        }
+      },
+      "shared_fcg": true,
+      "attention_padding_mask": false,
+      "main_table_complete_draws": 8,
+      "protocol": {
+        "name": "LIBERO Scene2",
+        "optimizer": "rank",
+        "candidates": 64,
+        "final_segment": 10,
+        "tasks": 150,
+        "groups": 3,
+        "training_seed": 218,
+        "segment": 10,
+        "terminal_goal_steps": 30
+      }
+    },
+    "caddy": {
+      "architecture": {
+        "latent_dim": 768,
+        "history_frames": 3,
+        "views": 2,
+        "future_nodes": 3,
+        "width": 512,
+        "depth": 6,
+        "heads": 8,
+        "ffn_width": 2048,
+        "euler_steps": 8
+      },
+      "variants": {
+        "true": {
+          "fcg_epoch": 154,
+          "fgss_epoch": 197,
+          "source_checkpoint_sha256": "5dbd6cfaead93e04dee688fcc7c6298d1a1e5196f1efa9379dc22019c73a1aa6",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_true.safetensors"
+        },
+        "generated": {
+          "fcg_epoch": 154,
+          "fgss_epoch": 178,
+          "source_checkpoint_sha256": "a1f283cbdcd2247e98f4a7a1fcc55ca728015fe1782706116e532a5c034ba917",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_generated.safetensors"
+        }
+      },
+      "shared_fcg": true,
+      "attention_padding_mask": false,
+      "main_table_complete_draws": 8,
+      "protocol": {
+        "name": "LIBERO Caddy",
+        "optimizer": "rank",
+        "candidates": 64,
+        "final_segment": 10,
+        "tasks": 150,
+        "groups": 3,
+        "training_seed": 218,
+        "segment": 10,
+        "terminal_goal_steps": 30
+      }
+    },
+    "antmaze": {
+      "architecture": {
+        "latent_dim": 384,
+        "history_frames": 1,
+        "views": 1,
+        "future_nodes": 3,
+        "width": 512,
+        "depth": 6,
+        "heads": 8,
+        "ffn_width": 2048,
+        "euler_steps": 8
+      },
+      "variants": {
+        "true": {
+          "fcg_epoch": 175,
+          "fgss_epoch": 181,
+          "source_checkpoint_sha256": "96358c301f68bd46585bbf62c837ba8229e455000c81d5ab654f02ecd6ee81ac",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_true.safetensors"
+        },
+        "generated": {
+          "fcg_epoch": 175,
+          "fgss_epoch": 275,
+          "source_checkpoint_sha256": "23729c0d861d769c009cc64787c673aa6b8eee7a6360ae1db4a3a3c6237db50b",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_generated.safetensors"
+        }
+      },
+      "shared_fcg": true,
+      "attention_padding_mask": false,
+      "main_table_complete_draws": 8,
+      "protocol": {
+        "name": "AntMaze D3",
+        "optimizer": "cem",
+        "candidates": 300,
+        "elites": 30,
+        "search_iterations": 30,
+        "final_segment": 5,
+        "action_budget": 350,
+        "tasks": 50,
+        "evaluation_seeds": [
+          42,
+          43,
+          44
+        ],
+        "training_seed": 42,
+        "generated_epochs": 300,
+        "segment": 10,
+        "terminal_goal_steps": 30
+      }
+    },
+    "fourroom": {
+      "architecture": {
+        "latent_dim": 192,
+        "history_frames": 3,
+        "views": 1,
+        "future_nodes": 3,
+        "width": 512,
+        "depth": 6,
+        "heads": 8,
+        "ffn_width": 2048,
+        "euler_steps": 8
+      },
+      "variants": {
+        "true": {
+          "fcg_epoch": 200,
+          "fgss_epoch": 197,
+          "source_checkpoint_sha256": "3421285c9ad5614a90d6aeea394baf891c3d7f918aa87f756f3ff2b3b9a24027",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_true.safetensors"
+        },
+        "generated": {
+          "fcg_epoch": 200,
+          "fgss_epoch": 195,
+          "source_checkpoint_sha256": "cc1f1def3d8259648497b563ab84f1decff2731c5d9664d741479115e11f40bc",
+          "fcg": "fcg.safetensors",
+          "fgss": "fgss_generated.safetensors"
+        }
+      },
+      "shared_fcg": true,
+      "attention_padding_mask": false,
+      "main_table_complete_draws": 8,
+      "protocol": {
+        "name": "FourRoom",
+        "optimizer": "gradient",
+        "candidates": 50,
+        "search_iterations": 90,
+        "action_learning_rate": 0.08,
+        "final_segment": 10,
+        "budgets_by_horizon": {
+          "75": 210,
+          "100": 280,
+          "125": 350
+        },
+        "tasks_per_horizon": 50,
+        "training_seed": 44,
+        "segment": 10,
+        "terminal_goal_steps": 30
+      }
+    }
+  }
+}
