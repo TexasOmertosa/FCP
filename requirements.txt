@@ -37,7 +37,7 @@ huggingface_hub
 # cube: hydra-core==1.3.5
 # cube: transformers==4.57.1
 
-# Scene2 and Caddy native runner. See USAGE.md for the two source checkouts.
+# Scene2 and Caddy native runner. See the native Cube and LIBERO section in README.md for the two source checkouts.
 # libero: torch==2.13.0
 # libero: torchvision==0.28.0
 # libero: stable-worldmodel==0.1.1
@@ -59,4 +59,4 @@ huggingface_hub
 
 # AntMaze: archived Stable World-Model 0.1.1, MuJoCo 3.14.0, Gymnasium 1.2.3
 # FourRoom: Gymnasium 1.2.3 and the H-JEPA environment at commit 97054ec
-# Upstream source and checkpoint locations are listed in ASSETS.md.
+# Upstream source and checkpoint locations are listed on the repository homepage.

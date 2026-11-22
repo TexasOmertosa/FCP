@@ -34,7 +34,7 @@ The public training CLI's **FCP upper-model** default seed schedule is shown bel
 | Scene2 | 217 / 218 | 314159 / 314160 | 1000220 / 1000221 | 20261027 |
 | Caddy | 217 / 218 | 314159 / 314160 | 1000220 / 1000221 | 20261027 |
 | AntMaze D3 | 42 / 42 | 314159 / 314159 | 500000045 / 500000045 | 1209 |
-| FourRoom | 44 / 44 | 314159 / 314160 | 44000044 / 44000044 | 77148 |
+| FourRoom | 44 / 44 | 314159 / 314160 | 44000132 / 44000132 | 77148 |
 
 The matched action-prior trainer defaults to seed 149 outside LIBERO and 218 for LIBERO. Its fixed validation sampling seed is 1209. Generated-condition training uses the frozen FCG and fixed generated-condition cache; the cache base seed and draw stride are defined in `priors/cache.py` and recorded in its cache manifest.
 
