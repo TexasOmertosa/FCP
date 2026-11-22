@@ -135,18 +135,24 @@
     "task_episode": 15706,
     "seed": 42,
     "branch_step": 50,
+    "frame_origin": 0,
     "context_frames": [
+      12,
+      17,
+      22
+    ],
+    "source_context_frames": [
       62,
       67,
       72
     ],
     "first_goal_hit": {
-      "left": 161,
-      "right": 230
+      "left": 111,
+      "right": 180
     },
     "frames": 285,
     "fps": 20,
-    "video_sha256": "07b26a3d3a39c7038b8e7d87aa3f70e54166684816ba38d919a146ddf9d6d0ac",
-    "gif_sha256": "acbef6f6a896c218758c2515c6f52023e9da2b6ff270f4d3b63b120b39902f43"
+    "video_sha256": "bfcadb2cbc573ea57222af6d9d8537687db799063f23792a6a6b8f807e41f6d6",
+    "gif_sha256": "7421d35f151c82938cc33400660d5e6e92883a9c2e619905d5444d540d6a0e19"
   }
 }
