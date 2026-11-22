@@ -3,55 +3,55 @@
     "task": 193,
     "first_success_step": 110,
     "first_success_frame_index": 220,
-    "frames": 622,
+    "frames": 321,
     "fps": 20,
-    "frames_after_success": 401,
-    "video_sha256": "a57a21f4db796efea6f6ce00ae4634a725879512666739e0fd9e2ca137cd2229"
+    "frames_after_success": 100,
+    "video_sha256": "d238ac3a0ae4a7c2e358933a729fb55d2c4f977374006d8845cd71e6b8fb23cc"
   },
   "antmaze_D3": {
     "task": 1,
     "first_success_step": 213,
     "first_success_frame_index": 213,
-    "frames": 234,
+    "frames": 314,
     "fps": 20,
-    "frames_after_success": 20,
-    "video_sha256": "885be4c64a3602d2c0ce647a4caf15d87143a5a924f12ca310ed4fca436c366a"
+    "frames_after_success": 100,
+    "video_sha256": "ac785f6920f7b9f325a5dda07a23231ae0ff5f8f5f15fe604dd1536ec4ae110c"
   },
   "fourroom_H125": {
     "task": 1,
     "first_success_step": 229,
     "first_success_frame_index": 458,
-    "frames": 479,
+    "frames": 559,
     "fps": 20,
-    "frames_after_success": 20,
-    "video_sha256": "001928b9c08645d6f29c7827026d237e82100306c9690bd2509aab3804f741c2"
+    "frames_after_success": 100,
+    "video_sha256": "297005f82340cb6923bf2d13d1d3e8a45dc5dc678e363edd012aff162f020505"
   },
   "cube_H150": {
     "task": 6,
     "first_success_step": 72,
     "first_success_frame_index": 72,
-    "frames": 93,
+    "frames": 173,
     "fps": 20,
-    "frames_after_success": 20,
-    "video_sha256": "ec14eba11a9195d400efcee36d960414f8d5f1c1f63bfa7bc24c8824b2372bc6"
+    "frames_after_success": 100,
+    "video_sha256": "0ebebebb815ac4ee5754779cc4731966e7851ca2a3b908bc747f13403bd45692"
   },
   "scene2": {
     "task": 1,
     "first_success_step": 226,
     "first_success_frame_index": 226,
-    "frames": 247,
+    "frames": 327,
     "fps": 20,
-    "frames_after_success": 20,
-    "video_sha256": "4155af2391b319166c84cb20791c2f5845cbd49c0e77b81e22da575eab0efdde"
+    "frames_after_success": 100,
+    "video_sha256": "05bfd89f3fb901077edc04bfa4a13ee18690062923bd48d60503c4e82758aca4"
   },
   "caddy": {
     "task": 14,
     "first_success_step": 215,
     "first_success_frame_index": 215,
-    "frames": 236,
+    "frames": 316,
     "fps": 20,
-    "frames_after_success": 20,
-    "video_sha256": "58dfac48da4347fede239d47c4c3042c0b4b6a694832ebc9c317a3fc20b97d8e"
+    "frames_after_success": 100,
+    "video_sha256": "ba4e8c7ba58cb3006240d41ae0214e9c8e90b290182d27720d2abfed35a369a2"
   },
   "pusht_H150": {
     "task": 41,
@@ -62,10 +62,10 @@
     "goal_frame": 169,
     "first_success_step": 101,
     "first_success_frame_index": 202,
-    "frames": 223,
+    "frames": 303,
     "fps": 20,
-    "frames_after_success": 20,
+    "frames_after_success": 100,
     "success_metric": "native PushT goal criterion",
-    "video_sha256": "daa8785c3a10a057a751d466bfb27e8ef574c1e6be99b9eb162e9914668119b4"
+    "video_sha256": "c2334ec80689f9d0cfd210e5108af678d5909f85b4e69d024b239cbd0afae916"
   }
 }

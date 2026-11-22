@@ -12,11 +12,11 @@ FCP predicts future states in the world model's latent space and uses them to se
 
 [![Full-task PushT comparison with the goal on the left](media/previews/pusht_full.gif)](media/pusht_full.mp4)
 
-FCP completes this task in **110 actions**. SAGE and H-JEPA reach the **300-action** limit. [Full-task MP4](media/pusht_full.mp4)
+FCP completes the full task in **110 actions**. [Full-task MP4](media/pusht_full.mp4)
 
 ## More comparisons
 
-Each comparison uses the same start and goal for the displayed methods. The goal is on the left. These clips continue for 20 video frames after FCP reaches the goal.
+Each comparison uses the same start and goal for the displayed methods. The goal is on the left. After FCP reaches the goal, its panel holds the success frame while the baselines continue for **5 seconds**.
 
 | Environment | Animated comparison |
 | --- | --- |
