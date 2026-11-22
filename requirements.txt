@@ -1,4 +1,30 @@
+# Core FCP training and latent inference dependencies for every environment.
 torch>=2.7
 numpy
 safetensors
 huggingface_hub
+
+# Simulator dependencies are listed below by environment. Install the relevant
+# set in its own Python environment when different MuJoCo versions are needed.
+
+# PushT native runner (see the installation command in README.md).
+# pusht: torch==2.13.0
+# pusht: torchvision==0.28.0
+# pusht: stable-worldmodel==0.1.1
+# pusht: stable-pretraining==0.1.7
+# pusht: gymnasium==1.3.0
+# pusht: pymunk==7.3.0
+# pusht: pygame==2.6.1
+# pusht: hydra-core==1.3.5
+# pusht: transformers==4.57.1
+# pusht: h5py==3.16.0
+# pusht: opencv-python-headless==5.0.0.93
+# pusht: shapely==2.1.2
+# pusht: numpy==2.2.6
+
+# Cube: stable-worldmodel==0.1.1, ogbench==1.2.1,
+#       mujoco==3.12.0, gymnasium==1.3.0
+# Scene2 and Caddy: LIBERO 0.1.0 from source, robosuite==1.4.0, mujoco==2.3.7
+# AntMaze: stable-worldmodel==0.1.1, mujoco==3.14.0, gymnasium==1.2.3
+# FourRoom: gymnasium==1.2.3 and the H-JEPA environment at commit 97054ec
+# Upstream source and checkpoint locations are listed in ASSETS.md.

@@ -9,13 +9,14 @@
     "video_sha256": "d238ac3a0ae4a7c2e358933a729fb55d2c4f977374006d8845cd71e6b8fb23cc"
   },
   "antmaze_D3": {
-    "task": 1,
-    "first_success_step": 213,
-    "first_success_frame_index": 213,
-    "frames": 314,
+    "task": 2,
+    "seed": 43,
+    "first_success_step": 137,
+    "first_success_frame_index": 137,
+    "frames": 238,
     "fps": 20,
     "frames_after_success": 100,
-    "video_sha256": "ac785f6920f7b9f325a5dda07a23231ae0ff5f8f5f15fe604dd1536ec4ae110c"
+    "video_sha256": "af4a700c6b99cd14273b1381611d51ff8580dbb2893d7b4e9a77c8cd277fe35e"
   },
   "fourroom_H125": {
     "task": 1,

@@ -73,10 +73,10 @@ PushT uses Pymunk for 2D physics. FourRoom implements its own 2D dynamics in the
 
 ## Native PushT evaluation
 
-Use the [PushT dependency file](requirements-pusht.txt) in a separate environment. The original full-task evaluation used Python 3.10, PyTorch 2.13.0 with CUDA 13.0, and an NVIDIA A100.
+Install the packages marked for PushT in [requirements.txt](requirements.txt) in a separate environment. The original full-task evaluation used Python 3.10, PyTorch 2.13.0 with CUDA 13.0, and an NVIDIA A100.
 
 ```bash
-pip install -r requirements-pusht.txt
+sed -n 's/^# pusht: //p' requirements.txt | xargs python -m pip install -r requirements.txt
 python -m fcp.closed_loop.pusht --variant true --trials 193 --output runs/pusht_trial193.json
 ```
 
