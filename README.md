@@ -33,17 +33,6 @@ FCP samples different future contexts for the first plan and then replans closed
 
 [Sampled contexts and trajectories](media/pusht_sampled_routes.npz)
 
-<details>
-<summary>Expert future intervention</summary>
-
-FCP starts from the same state and goal with shared random seeds. The first planning call uses future frames from demonstration A or B, and subsequent calls replan as usual. After 10 actions, the pusher positions are 4.37 simulator units apart.
-
-![PushT comparison with two demonstrated future contexts](media/previews/pusht_demo_context.gif)
-
-[Demonstration and rollout trajectories](media/pusht_demo_context.npz)
-
-</details>
-
 ## Closed-loop success rates
 
 Success rates (%) use the released FCP checkpoints and their matched priors. Segmented means average the six horizons from 25 to 150 steps. Values after ± are sample standard deviations across evaluation groups.
