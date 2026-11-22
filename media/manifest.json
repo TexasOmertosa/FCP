@@ -101,5 +101,34 @@
     "fps": 20,
     "video_sha256": "eb082853e27cc6cbd3b198b49eb8574a6c9e7ddfca54098c1d8448a5b54e50cc",
     "gif_sha256": "bdd4ec5883de5ed2d64ae8798bc5833d094d3deaa8469a25d78451d76f3057be"
+  },
+  "pusht_sampled_routes": {
+    "goal_episode": 15706,
+    "left_draw": "draw_3",
+    "right_draw": "draw_1",
+    "first_goal_hit": {
+      "draw_3": 175,
+      "draw_1": 246
+    },
+    "crossing": {
+      "y": 340.0,
+      "left_x": [
+        199.94301526470886,
+        199.15324730895108,
+        193.31611010661638,
+        194.7673882404663,
+        203.69006513788005
+      ],
+      "right_x": [
+        286.86789752104835,
+        283.55368876642257,
+        285.79095531794087
+      ]
+    },
+    "block_separation_at_step_70": 99.38657166572277,
+    "frames": 406,
+    "fps": 20,
+    "video_sha256": "eff2e22997e45ec15d07714f7bf4a36a90be4e0cb70289e7ed2910fc0aececa3",
+    "gif_sha256": "53ac4ab7609009b1b9d9788bfa7a39f7706f4abcb3dea9bca8ed0d93e66931a9"
   }
 }
