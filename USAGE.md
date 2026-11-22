@@ -13,7 +13,7 @@ Each environment shares one future-context generator (FCG) and has two future-gu
 
 [Checkpoint and data sources](ASSETS.md) · [Evaluation task data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks)
 
-For fixed data split manifests, exact training/evaluation seeds, artifact revisions, and the fresh-checkout verification scope, see [Reproducibility](REPRODUCIBILITY.md).
+For evaluation settings and artifact revisions, see [Reproducibility](REPRODUCIBILITY.md).
 
 ## Repository layout
 
@@ -35,7 +35,7 @@ Install `requirements.txt` in Python 3.10 or 3.11. Encode each split with the en
 python -m fcp.prepare --environment pusht --episodes episodes.npz --pairs pairs.npy --output train.npz
 ```
 
-Use separate episode arrays and index pairs for validation and test. The public benchmark task data provide fixed evaluation inputs. Training requires demonstration data, split indices, and the corresponding frozen encoder. [Original downloads](ASSETS.md)
+Pass `--split` to select the original episode partition from encoded source episodes. The public benchmark task data provide fixed evaluation inputs. [Original downloads](ASSETS.md)
 
 The resulting encoded NPZ windows contain `history` in `[N,D]` or `[N,T,D]`, `goal` and `subgoal` in `[N,D]`, and `future` in `[N,3,D]`. Generation reads `history` and `goal`. In the common window constructor, a start `t` and goal `g` give subgoal index `u=min(t+10,g)` and future indices `u+(j*(g-u)+2)//4` for `j=1,2,3`. Three-frame histories use offsets −10, −5, and 0, clipped to the episode start. The LIBERO latent order is external view followed by wrist view. PushT, Cube and AntMaze use the current observation only. Scene2, Caddy and FourRoom use three observations. For a run with saved labels, pass its exact frame indices via `--target-indices` or use its encoded NPZ directly.
 

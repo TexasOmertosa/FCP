@@ -57,7 +57,6 @@
           42
         ],
         "full_evaluation_seed": 42,
-        "training_seed": 148,
         "generated_epochs": 300,
         "segment": 10,
         "terminal_goal_steps": 30
@@ -133,7 +132,6 @@
           32,
           42
         ],
-        "training_seed": 148,
         "segment": 10,
         "terminal_goal_steps": 30
       },
@@ -203,7 +201,6 @@
         ],
         "evaluation_torch_seed": 42,
         "action_seed_base": 20260829,
-        "training_seed": 218,
         "segment": 10,
         "terminal_goal_steps": 30
       },
@@ -267,7 +264,6 @@
         "groups": 3,
         "evaluation_torch_seed": 42,
         "action_seed_base": 42,
-        "training_seed": 218,
         "segment": 10,
         "terminal_goal_steps": 30
       },
@@ -336,7 +332,6 @@
           43,
           44
         ],
-        "training_seed": 42,
         "generated_epochs": 300,
         "segment": 10,
         "terminal_goal_steps": 30
@@ -408,7 +403,6 @@
         "evaluation_seeds": [
           42
         ],
-        "training_seed": 44,
         "segment": 10,
         "terminal_goal_steps": 30
       },

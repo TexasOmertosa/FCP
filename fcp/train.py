@@ -19,6 +19,16 @@ from .numerics import UPPER_TRAIN
 from .release import CONFIGS, sha256_file
 
 
+_TRAIN_SEEDS = {
+    'pusht': 148,
+    'cube': 148,
+    'scene2': 218,
+    'caddy': 218,
+    'antmaze': 42,
+    'fourroom': 44,
+}
+
+
 def with_future_cache(path, data_path, checkpoint, windows, numerics, split):
     with np.load(path, allow_pickle=False) as cache:
         if (cache['input_sha256'].item() != sha256_file(data_path)
@@ -96,7 +106,7 @@ def main():
     if args.epochs is None:
         args.epochs = protocol.get('generated_epochs', 200) if args.condition == 'generated' else 200
     if args.seed is None:
-        args.seed = 217 if libero and args.stage == 'fcg' else protocol['training_seed']
+        args.seed = 217 if libero and args.stage == 'fcg' else _TRAIN_SEEDS[args.environment]
     if args.init_seed is None:
         args.init_seed = 314160 if args.stage == 'fgss' and (libero or args.environment == 'fourroom') else 314159
     if args.noise_seed is None:

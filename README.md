@@ -123,7 +123,7 @@ Both LIBERO suites use PyTorch seed 42 for evaluation. The fixed query manifest 
 
 ## Training
 
-Encode demonstrations with the frozen lower model. Provide an NPZ with `latents` and `episode_offsets`, and an NPY of start and goal frame pairs. Keep the episodes in source order or include `episode_ids`. For AntMaze and FourRoom, pass the original HDF5 basename with `--source-file`. Rebuilding the original training windows also requires the original frame pairs and any custom supervision indices.
+Encode demonstrations with the frozen lower model. Provide an NPZ with `latents` and `episode_offsets`, and an NPY of start and goal frame pairs. Keep the episodes in source order or include `episode_ids` for a subset. For AntMaze and FourRoom, pass the original HDF5 path with `--source-file`. For Scene2 and Caddy, pass the extracted archive's `DATASET_MANIFEST.json` with `--source-file` and read shards in filename order. Rebuilding the original training windows also requires the original frame pairs and any custom supervision indices.
 
 The example trains a shared FCG and a Generated FGSS on PushT.
 
