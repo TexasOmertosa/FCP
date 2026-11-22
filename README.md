@@ -54,7 +54,7 @@ The released GPU evaluation recipes use Python 3.10, PyTorch 2.13.0 and CUDA 13.
 | PushT | Stable World-Model 0.1.1, Pymunk 7.3.0, Pygame 2.6.1, Gymnasium 1.3.0 |
 | Cube | Stable World-Model 0.1.1, OGBench 1.2.1, MuJoCo 3.12.0, Gymnasium 1.3.0 |
 | Scene2, Caddy | LIBERO 0.1.0, robosuite 1.4.0, MuJoCo 2.3.7 |
-| AntMaze D3 | Stable World-Model 0.1.1, MuJoCo 3.14.0, Gymnasium 1.2.3 |
+| AntMaze D3 | [H-JEPA AntMaze at `97054ec`](https://github.com/kevinghst/H-JEPA/tree/97054ecaff83e13839195ec4b92d74c08a0127c5/stable_worldmodel/envs/ogbench), MuJoCo 3.14.0, Gymnasium 1.2.3, OGBench 1.2.1, Stable World-Model 0.1.1 |
 | FourRoom | Gymnasium 1.2.3, [H-JEPA simulator at `97054ec`](https://github.com/kevinghst/H-JEPA/tree/97054ecaff83e13839195ec4b92d74c08a0127c5) |
 
 ## Checkpoints
@@ -110,10 +110,12 @@ Training seeds below are the public defaults. Evaluation uses the listed seed gr
 |---|---|---|---:|---|
 | PushT | 42 | 148 / 148 | 149 | Full task 42, 440 tasks. Segmented 22, 32, 42, 100 tasks per seed and horizon. |
 | Cube | 42 | 148 / 148 | 149 | 22, 32, 42, 100 tasks per seed and horizon. |
-| Scene2 | Fixed SAGE split | 217 / 218 | 218 | 8501, 8502, 8503, 50 queries per group. |
-| Caddy | Fixed SAGE split | 217 / 218 | 218 | PyTorch seed 42. Fixed reset seeds for 150 queries in three groups of 50. |
+| Scene2 | Fixed SAGE split | 217 / 218 | 218 | SAGE queries, 50 each in groups 8501, 8502 and 8503. |
+| Caddy | Fixed SAGE split | 217 / 218 | 218 | 150 fixed SAGE queries with per-query reset seeds, reported in groups of 50. |
 | AntMaze D3 | 42 for validation selection | 42 / 42 | 149 | 42, 43, 44, 50 tasks per seed. |
 | FourRoom | 0 | 44 / 44 | 149 | Base seed 42, 50 tasks per horizon for H75, H100 and H125. |
+
+For both LIBERO suites, FCG and action-prior training use the SAGE seeds 217 and 218, and evaluation uses PyTorch seed 42.
 
 The retrained AntMaze and FourRoom lower LeWM models use training seeds 42 and 44, respectively. Open-loop evaluation uses seed 1209 by default. Initialization, noise and cache seeds are set by the training and cache code.
 
