@@ -25,6 +25,14 @@ FCP predicts future states in the world model's latent space and uses them to se
 | **AntMaze D3** | <img src="media/previews/antmaze_D3.gif" alt="AntMaze D3 comparison" width="650"> |
 | **FourRoom H125** | <img src="media/previews/fourroom_H125.gif" alt="FourRoom H125 comparison" width="650"> |
 
+## PushT: different futures, different first decisions
+
+FCP starts from the same state and goal with shared random seeds. The first planning call uses future frames from demonstration A or B, and subsequent calls replan as usual. After 10 actions, the pusher positions are 4.37 simulator units apart.
+
+![PushT comparison with two demonstrated future contexts](media/previews/pusht_demo_context.gif)
+
+[Demonstration and rollout trajectories](media/pusht_demo_context.npz)
+
 ## Closed-loop success rates
 
 Success rates (%) use the released FCP checkpoints and their matched priors. Segmented means average the six horizons from 25 to 150 steps. Values after ± are sample standard deviations across evaluation groups.

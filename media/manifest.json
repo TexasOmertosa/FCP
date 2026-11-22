@@ -76,5 +76,30 @@
     "frames_after_success": 100,
     "success_metric": "native PushT goal criterion",
     "video_sha256": "c2334ec80689f9d0cfd210e5108af678d5909f85b4e69d024b239cbd0afae916"
+  },
+  "pusht_demo_context": {
+    "episodes": [
+      6409,
+      6420
+    ],
+    "context_frames": [
+      [
+        26,
+        42,
+        58
+      ],
+      [
+        26,
+        42,
+        58
+      ]
+    ],
+    "seed": 42,
+    "initial_plan_actions": 10,
+    "pusher_separation_after_10_actions": 4.367670943297186,
+    "frames": 218,
+    "fps": 20,
+    "video_sha256": "eb082853e27cc6cbd3b198b49eb8574a6c9e7ddfca54098c1d8448a5b54e50cc",
+    "gif_sha256": "bdd4ec5883de5ed2d64ae8798bc5833d094d3deaa8469a25d78451d76f3057be"
   }
 }
