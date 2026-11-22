@@ -28,6 +28,21 @@ python test.py --environment pusht --variant generated --data test.npz --samples
 
 Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. Otherwise the commands download the selected release from its pinned Hugging Face revision. To cache Generated training conditions, use `generate.py --output-kind future --checkpoint fcg.pt --data train.npz` and pass its output to `train.py --future-cache`. The trainer checks the cache against the exact training split and FCG checkpoint.
 
+## Simulator versions
+
+Training and open-loop evaluation use encoded windows. Closed-loop evaluation uses the selected benchmark's native simulator for resets, observations, and action execution. Keep separate Python environments for incompatible simulator stacks, especially the different MuJoCo versions.
+
+| Environment | Native environment | Simulator stack |
+|---|---|---|
+| PushT | Stable World-Model PushT | Stable World-Model 0.1.1, Pymunk 7.3.0, Pygame 2.6.1, Gymnasium 1.3.0 |
+| Cube | Stable World-Model OGBench Cube | Stable World-Model 0.1.1, OGBench 1.2.1, MuJoCo 3.12.0, Gymnasium 1.3.0 |
+| Scene2 | LIBERO Scene2 | LIBERO 0.1.0, robosuite 1.4.0, MuJoCo 2.3.7 |
+| Caddy | LIBERO Caddy | LIBERO 0.1.0, robosuite 1.4.0, MuJoCo 2.3.7 |
+| AntMaze D3 | H-JEPA Visual AntMaze | Stable World-Model 0.1.1, MuJoCo 3.14.0, Gymnasium 1.2.3 |
+| FourRoom | H-JEPA FourRoom Distractors | Gymnasium 1.2.3, `swm/FourRoomDistractors-v0` from the H-JEPA source snapshot at `97054ec` |
+
+PushT uses Pymunk for 2D physics. FourRoom implements its own 2D dynamics in the environment. For Cube, LIBERO, and AntMaze, match the MuJoCo version of the selected benchmark. See the upstream [Stable World-Model](https://github.com/galilai-group/stable-worldmodel), [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO), and [H-JEPA](https://github.com/kevinghst/H-JEPA/commit/97054ecaff83e13839195ec4b92d74c08a0127c5) projects for native environment sources.
+
 ## Closed-loop evaluation
 
 Run `test.py --environment <key> --variant <variant> --backend module:factory`. The released setup averages eight complete FCG→FGSS draws and uses environment-specific action search. `selected_models.json` gives the defaults. The factory receives `(environment, variant, backend_config, device)` and connects the caller's simulator, frozen encoder and dynamics, and action prior. It supplies:

@@ -2,19 +2,33 @@
 
 **Future-Context Planning with Latent World Models**
 
-FCP predicts a future task context and uses it to select the next subgoal for closed-loop visual planning.
+FCP predicts future latent states, uses them to choose the next subgoal, and replans from new observations as the agent acts.
 
-[Model weights](https://huggingface.co/stardust8979/FCP-weights) · [Evaluation datasets](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks) · [Training, generation, and evaluation](USAGE.md)
+[**Model weights and action priors**](https://huggingface.co/stardust8979/FCP-weights) · [**Evaluation datasets**](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks) · [**Usage and simulator versions**](USAGE.md)
 
 ## Full-task PushT
 
-[![Full-task PushT with the goal at left. FCP-True succeeds while SAGE and H-JEPA fail.](media/previews/pusht_full.gif)](media/pusht_full.mp4)
+[![Full-task PushT. The goal is on the left, followed by FCP-True, SAGE, and H-JEPA.](media/previews/pusht_full.gif)](media/pusht_full.mp4)
 
-FCP-True completes the task in **110 actions**. SAGE and H-JEPA reach the **300-action** budget without completing the same task. [Watch full video](media/pusht_full.mp4)
+FCP-True completes this task in **110 actions**. SAGE and H-JEPA reach the **300-action** limit without completing it. [Watch the full video](media/pusht_full.mp4)
+
+## Quick start
+
+1. Clone this repository, enter it, and install the Python dependencies with `pip install -r requirements.txt`.
+2. Generate a latent subgoal from the included PushT observation and goal. The command downloads the matching FCP weights on the first run.
+
+   ```bash
+   python generate.py --environment pusht --variant true \
+     --data examples/pusht_window.npz --output subgoals.npz --device cpu
+   ```
+
+3. Use [the training and evaluation guide](USAGE.md) to train on encoded windows, measure held-out error, or connect the matching action prior and frozen world model for closed-loop evaluation. Set up the [simulator for your benchmark](USAGE.md#simulator-versions) before running closed-loop tests.
+
+**FCP-True** trains the subgoal solver with future states from demonstrations. **FCP-Generated** trains it with futures predicted by the frozen future generator. Both use predicted futures during deployment.
 
 ## More environments
 
-The videos show selected trials with the same initial state and goal for the compared methods. The left panel shows the goal. The AntMaze and FourRoom examples use the latest released navigation priors.
+Each video compares methods from the same initial state and goal. The left panel shows the goal.
 
 | Environment and outcome | Full comparison video |
 | --- | --- |
@@ -26,5 +40,5 @@ The videos show selected trials with the same initial state and goal for the com
 
 ## Downloads
 
-- FCP-True and FCP-Generated upper weights for all six environments, with one shared FCG, two FGSS checkpoints, and both matching action priors per environment. [Hugging Face model repository](https://huggingface.co/stardust8979/FCP-weights)
-- 440 full-task PushT trajectories, 50 AntMaze D3 tasks, and 50 FourRoom tasks each for H100 and H125. [Hugging Face dataset repository](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks)
+- [FCP model weights](https://huggingface.co/stardust8979/FCP-weights) include a shared future generator and separate True and Generated solvers and matching action priors for each of the six environments.
+- [FCP evaluation data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks) include 440 full-task PushT trials, 50 AntMaze D3 goals with per-seed initial states, and 50 tasks each for FourRoom H100 and H125.
