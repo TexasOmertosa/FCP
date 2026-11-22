@@ -15,7 +15,7 @@ from torch.nn.parallel import DistributedDataParallel
 from priors.config import ACTION_BLOCK, ACTION_TOKENS, DRAWS, EPOCHS, LIBERO, architecture
 from priors.data import PriorRows, load_condition, normalization
 from priors.model import ActionPrior
-from release import CONFIGS, sha256_file
+from fcp.release import CONFIGS, sha256_file
 
 
 def forward_args(batch):

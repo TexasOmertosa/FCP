@@ -7,10 +7,11 @@ import json
 import torch
 from torch.utils.data import DataLoader
 
-from evaluation import evaluate
-from fcp import load_checkpoint, read_windows
-from planner import run_episode
-from release import CONFIGS, load_selected
+from .closed_loop.planner import run_episode
+from .data import read_windows
+from .metrics import evaluate
+from .model import load_checkpoint
+from .release import CONFIGS, load_selected
 
 
 def closed_loop(model, args, device, protocol):
@@ -44,7 +45,7 @@ def main():
     mode.add_argument('--backend', help='Native environment integration as module:factory.')
     source = parser.add_mutually_exclusive_group()
     source.add_argument('--weights-root')
-    source.add_argument('--checkpoint', help='An FGSS checkpoint produced by train.py.')
+    source.add_argument('--checkpoint', help='An FGSS checkpoint produced by fcp.train.')
     parser.add_argument('--backend-config')
     parser.add_argument('--samples', type=int, nargs='+')
     parser.add_argument('--seed', type=int, default=1209)

@@ -8,9 +8,10 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from evaluation import evaluate
-from fcp import FCP, load_checkpoint, read_windows
-from release import CONFIGS, sha256_file
+from .data import read_windows
+from .metrics import evaluate
+from .model import FCP, load_checkpoint
+from .release import CONFIGS, sha256_file
 
 
 def main():
@@ -19,7 +20,7 @@ def main():
     parser.add_argument('--stage', choices=('fcg', 'fgss'), required=True)
     parser.add_argument('--condition', choices=('true', 'generated'))
     parser.add_argument('--fcg-checkpoint')
-    parser.add_argument('--future-cache', help='Optional output of generate.py --output-kind future.')
+    parser.add_argument('--future-cache', help='Optional output of fcp.generate --output-kind future.')
     parser.add_argument('--train', required=True)
     parser.add_argument('--val', required=True)
     parser.add_argument('--output', type=Path, required=True)

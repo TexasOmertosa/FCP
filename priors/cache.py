@@ -7,11 +7,11 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from fcp import load_checkpoint
+from fcp.model import load_checkpoint
 from priors.config import DRAWS
 from priors.data import PriorRows
 from priors.weights import upper_sha256
-from release import CONFIGS, load_selected, sha256_file
+from fcp.release import CONFIGS, load_selected, sha256_file
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
     parser.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
     source = parser.add_mutually_exclusive_group()
     source.add_argument('--weights-root', type=Path)
-    source.add_argument('--checkpoint', type=Path, help='An FGSS checkpoint from train.py.')
+    source.add_argument('--checkpoint', type=Path, help='An FGSS checkpoint from fcp.train.')
     args = parser.parse_args()
     if args.batch_size < 1:
         parser.error('Use a positive batch size.')

@@ -1,11 +1,8 @@
-"""Extract FCP windows from a single split of frozen demonstration latents."""
-
-import argparse
-from pathlib import Path
+"""Latent window preparation and dataset loading."""
 
 import numpy as np
-
-from release import CONFIGS
+import torch
+from torch.utils.data import TensorDataset
 
 
 def window_indices(n_frames, boundaries, pairs):
@@ -37,21 +34,22 @@ def make_windows(latents, boundaries, pairs, architecture):
                                ('subgoal', subgoal), ('future', future))}
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--environment', required=True, choices=CONFIGS)
-    parser.add_argument('--episodes', required=True, help='NPZ with latents and episode_offsets.')
-    parser.add_argument('--pairs', required=True, help='Integer NPY array of start/goal frame pairs.')
-    parser.add_argument('--output', required=True, type=Path)
-    args = parser.parse_args()
-    with np.load(args.episodes, allow_pickle=False) as data:
-        windows = make_windows(data['latents'], data['episode_offsets'],
-                               np.load(args.pairs, allow_pickle=False),
-                               CONFIGS[args.environment]['architecture'])
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    with args.output.open('wb') as stream:
-        np.savez_compressed(stream, **windows)
 
-
-if __name__ == '__main__':
-    main()
+def read_windows(path):
+    """Load frozen latent windows and infer their model dimensions."""
+    names = ('history', 'goal', 'subgoal', 'future')
+    with np.load(path, allow_pickle=False) as arrays:
+        history, goal, subgoal, future = (
+            torch.from_numpy(arrays[name].astype(np.float32, copy=False)) for name in names
+        )
+    if history.ndim == 2:
+        history = history[:, None]
+    if goal.ndim != 2 or min(goal.shape) < 1 or subgoal.shape != goal.shape:
+        raise ValueError('goal and subgoal must have the same nonempty shape [N, D].')
+    for name, tensor in (('history', history), ('future', future)):
+        if (tensor.ndim != 3 or tensor.shape[0] != goal.shape[0]
+                or tensor.shape[1] < 1 or tensor.shape[2] != goal.shape[1]):
+            raise ValueError(f'Invalid {name} shape.')
+    shape = dict(latent_dim=goal.shape[1], history_frames=history.shape[1],
+                 future_nodes=future.shape[1])
+    return TensorDataset(history, goal, subgoal, future), shape

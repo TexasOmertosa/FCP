@@ -52,5 +52,20 @@
     "fps": 20,
     "frames_after_success": 20,
     "video_sha256": "58dfac48da4347fede239d47c4c3042c0b4b6a694832ebc9c317a3fc20b97d8e"
+  },
+  "pusht_H150": {
+    "task": 41,
+    "seed": 32,
+    "horizon": 150,
+    "episode_id": 10841,
+    "start_frame": 19,
+    "goal_frame": 169,
+    "first_success_step": 101,
+    "first_success_frame_index": 202,
+    "frames": 223,
+    "fps": 20,
+    "frames_after_success": 20,
+    "success_metric": "native PushT goal criterion",
+    "video_sha256": "daa8785c3a10a057a751d466bfb27e8ef574c1e6be99b9eb162e9914668119b4"
   }
 }

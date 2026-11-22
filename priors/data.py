@@ -7,7 +7,7 @@ import numpy as np
 import torch
 
 from priors.config import ACTION_BLOCK, ACTION_DIM, ACTION_TOKENS, HISTORY_FRAMES, LIBERO, LOWDIM_DIM
-from release import CONFIGS, sha256_file
+from fcp.release import CONFIGS, sha256_file
 
 
 class PriorRows:

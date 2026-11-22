@@ -1,6 +1,6 @@
 """Action-prior dimensions, normalization conventions, and optimizer settings."""
 
-from release import CONFIGS
+from fcp.release import CONFIGS
 
 LIBERO = {'scene2', 'caddy'}
 ACTION_DIM = dict(pusht=2, cube=5, scene2=7, caddy=7, antmaze=8, fourroom=2)

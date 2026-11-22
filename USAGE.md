@@ -15,25 +15,22 @@ Each environment shares one future-context generator (FCG) and has two future-gu
 
 ## Repository layout
 
-| Entry point | Purpose |
+| Module | Purpose |
 |---|---|
-| [`prepare.py`](prepare.py) | Build training or evaluation windows from a split of frozen demonstration latents. |
-| [`fcp.py`](fcp.py) | FCG and FGSS flow networks, training objectives, and Euler integration. |
-| [`train.py`](train.py) | Train FCG and then either FGSS variant. |
-| [`generate.py`](generate.py) | Generate future contexts for training or subgoals for inference. |
-| [`priors/prepare.py`](priors/prepare.py) and [`priors/cache.py`](priors/cache.py) | Align expert action windows and cache eight-draw FCP conditions. |
-| [`priors/model.py`](priors/model.py) and [`priors/train.py`](priors/train.py) | Train and export the matching action prior. |
-| [`test.py`](test.py) and [`evaluation.py`](evaluation.py) | Evaluate prediction error and run a supplied closed-loop backend. |
-| [`benchmarks/pusht.py`](benchmarks/pusht.py) | Run native PushT full-task evaluation with the frozen LeWM and the matching action prior. |
-| [`release.py`](release.py) and [`selected_models.json`](selected_models.json) | Resolve checkpoint and task revisions and select the environment protocol. |
-| [`reproduce.py`](reproduce.py) | Verify the released upper-model predictions on one reference window per environment. |
+| [`fcp/model.py`](fcp/model.py) | FCG and FGSS flow networks, training objectives, and Euler integration. |
+| [`fcp/data.py`](fcp/data.py), [`fcp/prepare.py`](fcp/prepare.py) | Construct and load windows from frozen demonstration latents. |
+| [`fcp/train.py`](fcp/train.py), [`fcp/generate.py`](fcp/generate.py) | Train the two upper stages or generate future contexts and subgoals. |
+| [`fcp/evaluate.py`](fcp/evaluate.py), [`fcp/metrics.py`](fcp/metrics.py) | Evaluate prediction error or run a supplied closed-loop adapter. |
+| [`fcp/closed_loop/`](fcp/closed_loop) | Action search and native PushT full-task evaluation. |
+| [`fcp/release.py`](fcp/release.py), [`fcp/selected_models.json`](fcp/selected_models.json) | Resolve asset revisions and benchmark settings. |
+| [`priors/`](priors) | Build expert action windows, cache FCP conditions, and train the matching action prior. |
 
 ## Data preparation
 
 Install `requirements.txt` in Python 3.10 or 3.11. Encode each split with the environment's frozen encoder. Create a file `episodes.npz` containing `latents` with shape `[total_frames, D]` and `episode_offsets` with the start of every episode plus the final frame count. Supply `pairs.npy` with integer start and goal row indices `[N, 2]` for that split.
 
 ```bash
-python prepare.py --environment pusht --episodes episodes.npz --pairs pairs.npy --output train.npz
+python -m fcp.prepare --environment pusht --episodes episodes.npz --pairs pairs.npy --output train.npz
 ```
 
 Use separate episode arrays and index pairs for validation and test. The public benchmark task data provide fixed evaluation inputs. Training requires demonstration data, split indices, and the corresponding frozen encoder. [Original downloads](ASSETS.md)
@@ -45,27 +42,19 @@ The resulting encoded NPZ windows contain `history` in `[N,D]` or `[N,T,D]`, `go
 Train a shared FCG first and reuse that checkpoint for both FGSS variants.
 
 ```bash
-python train.py --environment pusht --stage fcg --train train.npz --val val.npz --output fcg.pt
-python train.py --environment pusht --stage fgss --condition true --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output true.pt
-python train.py --environment pusht --stage fgss --condition generated --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output generated.pt
+python -m fcp.train --environment pusht --stage fcg --train train.npz --val val.npz --output fcg.pt
+python -m fcp.train --environment pusht --stage fgss --condition true --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output true.pt
+python -m fcp.train --environment pusht --stage fgss --condition generated --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output generated.pt
 
-python generate.py --environment pusht --variant generated --data test.npz --output subgoals.npz
-python test.py --environment pusht --variant generated --data test.npz --samples 1 8
+python -m fcp.generate --environment pusht --variant generated --data test.npz --output subgoals.npz
+python -m fcp.evaluate --environment pusht --variant generated --data test.npz --samples 1 8
 ```
 
-Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. Otherwise the commands download the selected release from its pinned Hugging Face revision. To cache Generated training conditions, use `generate.py --output-kind future --checkpoint fcg.pt --data train.npz` and pass its output to `train.py --future-cache`. The trainer checks the cache against the exact training split and FCG checkpoint.
+Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. Otherwise the commands download the selected release from its pinned Hugging Face revision. To cache Generated training conditions, use `python -m fcp.generate --output-kind future --checkpoint fcg.pt --data train.npz` and pass its output to `python -m fcp.train --future-cache`. The trainer checks the cache against the exact training split and FCG checkpoint.
 
 ## Train the action prior
 
 Follow the [action-prior training guide](priors/README.md) after fitting FCG and FGSS. The prior receives fixed eight-draw subgoal targets and is fitted separately for each FCP variant.
-
-## Verify the published predictions
-
-```bash
-python reproduce.py --verify-priors
-```
-
-This evaluates both training variants for all six environments on the included encoded reference windows. It compares one- and eight-draw predictions against fixed CPU reference errors, verifies the matching action-prior checksums, and samples candidate actions from each prior. Use `--environment <key>` to verify one environment or `--weights-root <directory>` to use a local mirror. The reference errors are for these six windows.
 
 ## Simulator versions
 
@@ -88,14 +77,14 @@ Use the [PushT dependency file](requirements-pusht.txt) in a separate environmen
 
 ```bash
 pip install -r requirements-pusht.txt
-python -m benchmarks.pusht --variant true --trials 193 --output runs/pusht_trial193.json
+python -m fcp.closed_loop.pusht --variant true --trials 193 --output runs/pusht_trial193.json
 ```
 
 Omit `--trials` for all 440 tasks. Use `--variant generated` for the other FCP configuration. The runner downloads the pinned task set, FCP weights, action prior, and official LeWM checkpoint. It loads each task's recorded start and goal, averages eight complete FCG→FGSS draws, scores the prior's action proposals with LeWM, and replans after each executed action segment. The output includes the first step with block coverage above 0.85 and the first native pose match. The native runner replans from the current observations. In the release check, trial 193 succeeded in 94 actions on an A100. The archived video records 110 actions for that trial. [Frozen PushT LeWM checkpoint](https://huggingface.co/quentinll/lewm-pusht/tree/22b330c28c27ead4bfd1888615af1340e3fe9052)
 
 ## Connect other simulators
 
-The general closed-loop entry point is `test.py --environment <key> --variant <variant> --backend module:factory`. Cube, Scene2, Caddy, AntMaze, and FourRoom require a native adapter that supplies the matching frozen encoder and dynamics, exact task reset and success rules, and action-prior inference. The benchmark settings in [`selected_models.json`](selected_models.json) provide the published search sizes, evaluation seeds, and action budgets. The source links give the exact checkpoints and task inputs. [Download checkpoints and data](ASSETS.md)
+The general closed-loop entry point is `python -m fcp.evaluate --environment <key> --variant <variant> --backend module:factory`. Cube, Scene2, Caddy, AntMaze, and FourRoom require a native adapter that supplies the matching frozen encoder and dynamics, exact task reset and success rules, and action-prior inference. The benchmark settings in [`fcp/selected_models.json`](fcp/selected_models.json) provide the published search sizes, evaluation seeds, and action budgets. The source links give the exact checkpoints and task inputs. [Download checkpoints and data](ASSETS.md)
 
 The backend factory receives `(environment, variant, backend_config, device)` and implements the following methods.
 

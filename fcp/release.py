@@ -4,7 +4,7 @@ import json
 from hashlib import sha256
 from pathlib import Path
 
-from fcp import load_fcp
+from .model import load_fcp
 
 REGISTRY = json.loads(Path(__file__).with_name('selected_models.json').read_text())
 CONFIGS = REGISTRY['environments']

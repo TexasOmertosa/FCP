@@ -7,7 +7,7 @@ from safetensors.torch import load_file
 
 from priors.config import architecture
 from priors.model import ActionPrior
-from release import CONFIGS, prior_assets, sha256_file
+from fcp.release import CONFIGS, prior_assets, sha256_file
 
 
 def load_prior(environment, variant, device, *, weights_root=None, prior_root=None, upper=None):

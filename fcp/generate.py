@@ -7,8 +7,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from fcp import load_checkpoint
-from release import CONFIGS, load_selected, sha256_file
+from .model import load_checkpoint
+from .release import CONFIGS, load_selected, sha256_file
 
 
 @torch.no_grad()
@@ -25,7 +25,7 @@ def main():
     parser.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
     source = parser.add_mutually_exclusive_group()
     source.add_argument('--weights-root')
-    source.add_argument('--checkpoint', help='An output checkpoint from train.py.')
+    source.add_argument('--checkpoint', help='An output checkpoint from fcp.train.')
     args = parser.parse_args()
     count = args.samples if args.samples is not None else (1 if args.output_kind == 'future' else 8)
     if count < 1 or args.batch_size < 1 or (args.output_kind == 'future' and count != 1):

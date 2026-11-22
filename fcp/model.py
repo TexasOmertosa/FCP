@@ -200,29 +200,6 @@ class FCP(nn.Module):
         return torch.stack(subgoals).mean(dim=0)
 
 
-def read_windows(path):
-    """Load frozen latent windows and infer their model dimensions."""
-    import numpy as np
-    from torch.utils.data import TensorDataset
-
-    names = ('history', 'goal', 'subgoal', 'future')
-    with np.load(path, allow_pickle=False) as arrays:
-        history, goal, subgoal, future = (
-            torch.from_numpy(arrays[name].astype(np.float32, copy=False)) for name in names
-        )
-    if history.ndim == 2:
-        history = history[:, None]
-    if goal.ndim != 2 or min(goal.shape) < 1 or subgoal.shape != goal.shape:
-        raise ValueError('goal and subgoal must have the same nonempty shape [N, D].')
-    for name, tensor in (('history', history), ('future', future)):
-        if (tensor.ndim != 3 or tensor.shape[0] != goal.shape[0]
-                or tensor.shape[1] < 1 or tensor.shape[2] != goal.shape[1]):
-            raise ValueError(f'Invalid {name} shape.')
-    shape = dict(latent_dim=goal.shape[1], history_frames=history.shape[1],
-                 future_nodes=future.shape[1])
-    return TensorDataset(history, goal, subgoal, future), shape
-
-
 def load_checkpoint(path, device, stage):
     checkpoint = torch.load(path, map_location='cpu', weights_only=True)
     if checkpoint['stage'] != stage:

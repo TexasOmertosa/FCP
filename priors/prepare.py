@@ -5,9 +5,9 @@ from pathlib import Path
 
 import numpy as np
 
-from prepare import window_indices
+from fcp.data import window_indices
 from priors.config import ACTION_BLOCK, ACTION_DIM, ACTION_TOKENS, HISTORY_FRAMES, LIBERO, LOWDIM_DIM
-from release import CONFIGS
+from fcp.release import CONFIGS
 
 
 def prepare_rows(episodes, pairs, environment, output):

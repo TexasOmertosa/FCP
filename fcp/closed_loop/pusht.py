@@ -10,9 +10,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from fcp import load_checkpoint
+from fcp.model import load_checkpoint
 from priors.weights import load_prior
-from release import CONFIGS, load_selected, resolve_file, sha256_file
+from fcp.release import CONFIGS, load_selected, resolve_file, sha256_file
 
 
 LEWM_REPO = 'quentinll/lewm-pusht'

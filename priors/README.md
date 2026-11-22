@@ -31,7 +31,7 @@ python -m priors.train --environment pusht --variant true \
   --output prior_runs/pusht_true
 ```
 
-The cache uses the selected release by default. Pass `--checkpoint <fgss.pt>` to cache conditions from locally trained FCP weights. Repeat the cache and training commands with `--variant generated` and separate output paths for the other FCP pair. Each cache records its split, data checksums, upper-weight checksum, seed, and complete draw count.
+The cache uses the selected release by default. Pass `--checkpoint <fgss.pt>` to cache conditions from locally trained FCP weights from `python -m fcp.train`. Repeat the cache and training commands with `--variant generated` and separate output paths for the other FCP pair. Each cache records its split, data checksums, upper-weight checksum, seed, and complete draw count.
 
 Training uses AdamW for 30 epochs at a constant learning rate of `1e-4`, weight decay of `1e-4`, and gradient clipping at 1. The loss is trajectory negative log likelihood plus 0.05 times the lowest per-mode action L1 error. Each environment uses an eight-component mixture with a width-512, three-layer Transformer decoder and eight attention heads.
 
