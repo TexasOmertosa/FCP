@@ -29,17 +29,13 @@ Each comparison uses the same start and goal for the displayed methods. The goal
 
 Success rates (%) follow the paper’s main comparison. Segmented means average the six horizons from 25 to 150 steps. Values after ± are sample standard deviations across evaluation groups.
 
-| Benchmark | FCP-True | FCP-Generated | SAGE | H-JEPA | HWM |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| PushT full task | **86.82** | 83.18 | 46.59 | 35.00 | 34.77 |
-| PushT segmented mean | **90.72 ± 0.67** | 90.11 ± 1.42 | 74.72 ± 1.54 | 48.22 ± 0.92 | 52.61 ± 1.13 |
-| Cube segmented mean | **90.22 ± 1.77** | 89.61 ± 0.51 | 82.00 ± 0.58 | 46.89 ± 2.47 | 52.39 ± 1.42 |
-| LIBERO Scene2 | 61.33 ± 3.06 | **70.67 ± 1.15** | 48.67 ± 1.15 | — | — |
-| LIBERO Caddy | 66.00 ± 5.29 | **74.67 ± 1.15** | 58.00 ± 7.21 | — | — |
-| AntMaze D3 | **96.00 ± 2.00** | 89.33 ± 4.62 | — | 70.00 ± 8.00 | 36.00 ± 3.46 |
-| FourRoom H75 | **100.00** | 80.00 | — | 96.00 | **100.00** |
-| FourRoom H100 | **100.00** | 98.00 | — | 26.00 | 4.00 |
-| FourRoom H125 | 54.00 | **56.00** | — | 0.00 | 0.00 |
+| Method | PushT full task | PushT segmented mean | Cube segmented mean | LIBERO Scene2 | LIBERO Caddy | AntMaze D3 | FourRoom H75 | FourRoom H100 | FourRoom H125 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| FCP-True | **86.82** | **90.72 ± 0.67** | **90.22 ± 1.77** | 61.33 ± 3.06 | 66.00 ± 5.29 | **96.00 ± 2.00** | **100.00** | **100.00** | 54.00 |
+| FCP-Generated | 83.18 | 90.11 ± 1.42 | 89.61 ± 0.51 | **70.67 ± 1.15** | **74.67 ± 1.15** | 89.33 ± 4.62 | 80.00 | 98.00 | **56.00** |
+| SAGE | 46.59 | 74.72 ± 1.54 | 82.00 ± 0.58 | 48.67 ± 1.15 | 58.00 ± 7.21 | — | — | — | — |
+| H-JEPA | 35.00 | 48.22 ± 0.92 | 46.89 ± 2.47 | — | — | 70.00 ± 8.00 | 96.00 | 26.00 | 0.00 |
+| HWM | 34.77 | 52.61 ± 1.13 | 52.39 ± 1.42 | — | — | 36.00 ± 3.46 | **100.00** | 4.00 | 0.00 |
 
 ## Quick start
 
