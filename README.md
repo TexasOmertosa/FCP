@@ -110,12 +110,12 @@ Training seeds below are the public defaults. Evaluation uses the listed seed gr
 |---|---|---|---:|---|
 | PushT | 42 | 148 / 148 | 149 | Full task 42, 440 tasks. Segmented 22, 32, 42, 100 tasks per seed and horizon. |
 | Cube | 42 | 148 / 148 | 149 | 22, 32, 42, 100 tasks per seed and horizon. |
-| Scene2 | Fixed SAGE split | 217 / 218 | 218 | SAGE queries, 50 each in groups 8501, 8502 and 8503. |
-| Caddy | Fixed SAGE split | 217 / 218 | 218 | 150 fixed SAGE queries with per-query reset seeds, reported in groups of 50. |
+| Scene2 | Fixed episode CSV | 217 / 218 | 218 | 150 fixed queries in groups seeded with 8501, 8502 and 8503, 50 per group. |
+| Caddy | Fixed episode CSV | 217 / 218 | 218 | 150 fixed queries in three groups of 50. Reset seeds are recorded per query. |
 | AntMaze D3 | 42 for validation selection | 42 / 42 | 149 | 42, 43, 44, 50 tasks per seed. |
 | FourRoom | 0 | 44 / 44 | 149 | Base seed 42, 50 tasks per horizon for H75, H100 and H125. |
 
-For both LIBERO suites, FCG and action-prior training use the SAGE seeds 217 and 218, and evaluation uses PyTorch seed 42.
+Both LIBERO suites use PyTorch seed 42 for evaluation. The fixed query manifest records simulator reset seeds for both suites.
 
 The retrained AntMaze and FourRoom lower LeWM models use training seeds 42 and 44, respectively. Open-loop evaluation uses seed 1209 by default. Initialization, noise and cache seeds are set by the training and cache code.
 
