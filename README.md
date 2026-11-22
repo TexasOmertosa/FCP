@@ -10,9 +10,9 @@ FCP predicts future states in the world model's latent space and uses them to se
 
 ## Full-task PushT
 
-[![Full-task PushT comparison with the goal on the left](media/previews/pusht_full.gif)](media/pusht_full.mp4)
+![Full-task PushT comparison with the goal on the left](media/previews/pusht_full.gif)
 
-FCP completes the full task in **110 actions**. [Full-task MP4](media/pusht_full.mp4)
+FCP completes the full task in **110 actions**.
 
 ## More comparisons
 
@@ -20,12 +20,12 @@ Each comparison uses the same start and goal for the displayed methods. The goal
 
 | Environment | Animated comparison |
 | --- | --- |
-| **PushT H150** · [MP4](media/pusht_H150.mp4) | [<img src="media/previews/pusht_H150.gif" alt="PushT H150 segmented comparison" width="650">](media/pusht_H150.mp4) |
-| **Cube H150** · [MP4](media/cube_H150.mp4) | [<img src="media/previews/cube_H150.gif" alt="Cube H150 comparison" width="650">](media/cube_H150.mp4) |
-| **LIBERO Scene2** · [MP4](media/scene2.mp4) | [<img src="media/previews/scene2.gif" alt="Scene2 comparison" width="650">](media/scene2.mp4) |
-| **LIBERO Caddy** · [MP4](media/caddy.mp4) | [<img src="media/previews/caddy.gif" alt="Caddy comparison" width="650">](media/caddy.mp4) |
-| **AntMaze D3** · [MP4](media/antmaze_D3.mp4) | [<img src="media/previews/antmaze_D3.gif" alt="AntMaze D3 comparison" width="650">](media/antmaze_D3.mp4) |
-| **FourRoom H125** · [MP4](media/fourroom_H125.mp4) | [<img src="media/previews/fourroom_H125.gif" alt="FourRoom H125 comparison" width="650">](media/fourroom_H125.mp4) |
+| **PushT H150** | <img src="media/previews/pusht_H150.gif" alt="PushT H150 segmented comparison" width="650"> |
+| **Cube H150** | <img src="media/previews/cube_H150.gif" alt="Cube H150 comparison" width="650"> |
+| **LIBERO Scene2** | <img src="media/previews/scene2.gif" alt="Scene2 comparison" width="650"> |
+| **LIBERO Caddy** | <img src="media/previews/caddy.gif" alt="Caddy comparison" width="650"> |
+| **AntMaze D3** | <img src="media/previews/antmaze_D3.gif" alt="AntMaze D3 comparison" width="650"> |
+| **FourRoom H125** | <img src="media/previews/fourroom_H125.gif" alt="FourRoom H125 comparison" width="650"> |
 
 ## Repository layout
 
