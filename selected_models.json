@@ -1,8 +1,8 @@
 {
   "model_repo": "stardust8979/FCP-weights",
-  "model_revision": "620730a88a4ba8d51d507de9ba8395fd1b3651fd",
+  "model_revision": "2727a680b2d45ce7cca1768ff272f4614245afd4",
   "task_repo": "stardust8979/FCP-evaluation-tasks",
-  "task_revision": "fc79769345d21add93ab75ef509b42ba390b1df0",
+  "task_revision": "f5cd0e6c8fc662933f549033d850dc31fcd5935d",
   "environments": {
     "pusht": {
       "architecture": {
@@ -61,6 +61,20 @@
         "generated_epochs": 300,
         "segment": 10,
         "terminal_goal_steps": 30
+      },
+      "action_priors": {
+        "true": {
+          "file": "action_prior_true.safetensors",
+          "epoch": 30,
+          "weight_sha256": "df4e1f5736e56c2dfe183a9a2356b4bd79cc36cc33575d61d358ee6f49cd85db",
+          "evaluation_release": "main comparison"
+        },
+        "generated": {
+          "file": "action_prior_generated.safetensors",
+          "epoch": 29,
+          "weight_sha256": "b66a9d0e0521210590618628a98be0c2c5ed231131d46ae23f2d531f67c9ac3f",
+          "evaluation_release": "main comparison"
+        }
       }
     },
     "cube": {
@@ -117,6 +131,20 @@
         "training_seed": 148,
         "segment": 10,
         "terminal_goal_steps": 30
+      },
+      "action_priors": {
+        "true": {
+          "file": "action_prior_true.safetensors",
+          "epoch": 15,
+          "weight_sha256": "c84111ce8e48c78188e97fb0292aabc0c75a5e24432e0e92e1cfc10e3ca70a3c",
+          "evaluation_release": "main comparison"
+        },
+        "generated": {
+          "file": "action_prior_generated.safetensors",
+          "epoch": 10,
+          "weight_sha256": "71514d5d0c100c0deebb162a91ef9c41cd5db966a8289dc54e973fba194bcb0e",
+          "evaluation_release": "main comparison"
+        }
       }
     },
     "scene2": {
@@ -161,6 +189,20 @@
         "training_seed": 218,
         "segment": 10,
         "terminal_goal_steps": 30
+      },
+      "action_priors": {
+        "true": {
+          "file": "action_prior_true.safetensors",
+          "epoch": 30,
+          "weight_sha256": "151eecb827b573ae81dc21ddd99dbdeb884f3ed1321c8d67b66f6435b0415f93",
+          "evaluation_release": "main comparison"
+        },
+        "generated": {
+          "file": "action_prior_generated.safetensors",
+          "epoch": 30,
+          "weight_sha256": "2fbfd3699d64a19eba58f482afd2d14fb83bcd2403c981f5b4b777b6c4b27de5",
+          "evaluation_release": "main comparison"
+        }
       }
     },
     "caddy": {
@@ -204,6 +246,20 @@
         "training_seed": 218,
         "segment": 10,
         "terminal_goal_steps": 30
+      },
+      "action_priors": {
+        "true": {
+          "file": "action_prior_true.safetensors",
+          "epoch": 29,
+          "weight_sha256": "cae3da1da37642bb3884fc39f46821c3c3ac775808f597c004b67612696acbfa",
+          "evaluation_release": "main comparison"
+        },
+        "generated": {
+          "file": "action_prior_generated.safetensors",
+          "epoch": 29,
+          "weight_sha256": "69e6470f0a18c33d5647a6d553706379236a32f7ff08892cc9f2b82e6fa0ee2d",
+          "evaluation_release": "main comparison"
+        }
       }
     },
     "antmaze": {
@@ -255,6 +311,20 @@
         "generated_epochs": 300,
         "segment": 10,
         "terminal_goal_steps": 30
+      },
+      "action_priors": {
+        "true": {
+          "file": "action_prior_true.safetensors",
+          "epoch": 11,
+          "weight_sha256": "f9d505804246e9236fa13e2f49293f355178468580606f40ce220a89ae1699a3",
+          "evaluation_release": "2026-11-22"
+        },
+        "generated": {
+          "file": "action_prior_generated.safetensors",
+          "epoch": 8,
+          "weight_sha256": "3109161d21bc798761f9d2415251aa3000eadfad5fcaf3c41586fc39d7828ec1",
+          "evaluation_release": "2026-11-22"
+        }
       }
     },
     "fourroom": {
@@ -304,6 +374,20 @@
         "training_seed": 44,
         "segment": 10,
         "terminal_goal_steps": 30
+      },
+      "action_priors": {
+        "true": {
+          "file": "action_prior_true.safetensors",
+          "epoch": 30,
+          "weight_sha256": "88f0e8bbe6629d8bb726040aa2d3139a05b2d230a9da074df86c86159ab4a1ad",
+          "evaluation_release": "2026-11-22"
+        },
+        "generated": {
+          "file": "action_prior_generated.safetensors",
+          "epoch": 30,
+          "weight_sha256": "8e965455e9ba3932cf798a88f1962824c8b243f0b7c402e307cb7d9a76f038cd",
+          "evaluation_release": "2026-11-22"
+        }
       }
     }
   }
