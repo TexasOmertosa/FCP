@@ -2,7 +2,7 @@
 
 **Future-Context Planning with Latent World Models**
 
-[![FCP weights and action priors](https://img.shields.io/badge/Checkpoints-Hugging%20Face-ffc84a?logo=huggingface)](https://huggingface.co/stardust8979/FCP-weights) [![Evaluation datasets](https://img.shields.io/badge/Data-Evaluation-278060)](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks) [![Reproduction guide](https://img.shields.io/badge/Guide-Reproduction-315caa)](USAGE.md) [![Original downloads](https://img.shields.io/badge/Assets-Original%20sources-5c5379)](ASSETS.md)
+[![FCP weights and action priors](https://img.shields.io/badge/Checkpoints-Hugging%20Face-ffc84a?logo=huggingface)](https://huggingface.co/stardust8979/FCP-weights) [![Evaluation datasets](https://img.shields.io/badge/Data-Evaluation-278060)](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks) [![Reproduction guide](https://img.shields.io/badge/Guide-Reproduction-315caa)](REPRODUCIBILITY.md) [![Original downloads](https://img.shields.io/badge/Assets-Original%20sources-5c5379)](ASSETS.md)
 
 ## Overview
 
@@ -36,6 +36,10 @@ Success rates (%) use the released FCP checkpoints and their matched priors. Seg
 | HWM | 34.77 | 52.61 ± 1.13 | 52.39 ± 1.42 | — | — | 36.00 ± 3.46 | **100.00** | 4.00 | 0.00 |
 
 AntMaze and FourRoom use the SAGE action priors retrained on November 22. [Navigation task counts and seeds](USAGE.md#navigation-weights-and-evaluation)
+
+## Checkpoints
+
+The download table lists the frozen lower world model, shared FCG, True and Generated FGSS, and the corresponding action priors for each environment. [Checkpoint downloads](ASSETS.md)
 
 ## Quick start
 

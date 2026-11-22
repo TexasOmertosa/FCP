@@ -13,6 +13,8 @@ Each environment shares one future-context generator (FCG) and has two future-gu
 
 [Checkpoint and data sources](ASSETS.md) · [Evaluation task data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks)
 
+For fixed data split manifests, exact training/evaluation seeds, artifact revisions, and the fresh-checkout verification scope, see [Reproducibility](REPRODUCIBILITY.md).
+
 ## Repository layout
 
 | Module | Purpose |
@@ -160,7 +162,7 @@ The released AntMaze and FourRoom checkpoints are paired with individually retra
 | FCP-True | 146/150, 97.33 ± 1.15% | 50/50, 100% | 50/50, 100% | 24/50, 48% |
 | FCP-Generated | 134/150, 89.33 ± 4.62% | 42/50, 84% | 45/50, 90% | 26/50, 52% |
 
-Running these two evaluations requires the two exact retrained lower checkpoints and the corresponding native controllers from the project archive. The asset list identifies their paths and checksums. [Navigation model and task assets](ASSETS.md#frozen-lower-models)
+Download the retrained LeWM checkpoint and normalizer for each navigation environment. Evaluating the native protocol also requires the corresponding navigation controller. See the backend interface below. [Navigation lower models](ASSETS.md#frozen-lower-models) · [FCP and action priors](ASSETS.md#fcp-and-action-priors)
 
 ## Connect other simulators
 
