@@ -19,7 +19,7 @@ class PriorRows:
         lowdim = LOWDIM_DIM[environment]
         if lowdim:
             self.array_paths['lowdim'] = root / 'lowdim.npy'
-        if environment not in LIBERO:
+        if environment not in LIBERO or (root / 'goal_offset.npy').exists():
             self.array_paths['goal_offset'] = root / 'goal_offset.npy'
         if (root / 'upper_history.npy').exists():
             self.array_paths['upper_history'] = root / 'upper_history.npy'

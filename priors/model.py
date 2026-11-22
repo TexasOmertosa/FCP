@@ -258,6 +258,12 @@ class ActionPrior(nn.Module):
         return nll, best_l1
 
     @torch.no_grad()
+    def top_mode(self, history, goal, lowdim, **kwargs):
+        result = self._slice_outputs(self(history, goal, lowdim, **kwargs), kwargs.get('action_horizon'))
+        indices = result['logits'].argmax(dim=-1)
+        return result['means'][torch.arange(len(indices), device=indices.device), indices]
+
+    @torch.no_grad()
     def sample(
         self,
         history_latents,

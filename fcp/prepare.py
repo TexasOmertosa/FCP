@@ -14,12 +14,13 @@ def main():
     parser.add_argument('--environment', required=True, choices=CONFIGS)
     parser.add_argument('--episodes', required=True, help='NPZ with latents and episode_offsets.')
     parser.add_argument('--pairs', required=True, help='Integer NPY array of start/goal frame pairs.')
+    parser.add_argument('--target-indices', help='Optional NPY with the four archived supervision frames per window.')
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     with np.load(args.episodes, allow_pickle=False) as data:
-        windows = make_windows(data['latents'], data['episode_offsets'],
-                               np.load(args.pairs, allow_pickle=False),
-                               CONFIGS[args.environment]['architecture'])
+        targets = np.load(args.target_indices, allow_pickle=False) if args.target_indices else None
+        windows = make_windows(data['latents'], data['episode_offsets'], np.load(args.pairs, allow_pickle=False),
+                               CONFIGS[args.environment]['architecture'], targets)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('wb') as stream:
         np.savez_compressed(stream, **windows)

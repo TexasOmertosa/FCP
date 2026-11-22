@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 from fcp.data import window_indices
-from priors.config import ACTION_BLOCK, ACTION_DIM, ACTION_TOKENS, HISTORY_FRAMES, LIBERO, LOWDIM_DIM
+from priors.config import ACTION_BLOCK, ACTION_DIM, ACTION_TOKENS, HISTORY_FRAMES, LOWDIM_DIM
 from fcp.release import CONFIGS
 
 
@@ -35,8 +35,7 @@ def prepare_rows(episodes, pairs, environment, output):
                   actions=(n, width, ACTION_DIM[environment]))
     if low_dims:
         shapes['lowdim'] = (n, low_dims)
-    if environment not in LIBERO:
-        shapes['goal_offset'] = (n,)
+    shapes['goal_offset'] = (n,)
     if upper_latents is not None:
         shapes['upper_history'] = (n, history_frames, dimensions)
     output.mkdir(parents=True, exist_ok=False)
@@ -53,8 +52,7 @@ def prepare_rows(episodes, pairs, environment, output):
         arrays['actions'][batch] = actions[starts[:, None] + np.arange(width)]
         if low_dims:
             arrays['lowdim'][batch] = lowdim[starts]
-        if environment not in LIBERO:
-            arrays['goal_offset'][batch] = goals - starts
+        arrays['goal_offset'][batch] = goals - starts
         if upper_latents is not None:
             arrays['upper_history'][batch] = upper_latents[history[:, -history_frames:]]
     for array in arrays.values():

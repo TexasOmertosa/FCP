@@ -27,15 +27,17 @@ Each comparison uses the same start and goal for the displayed methods. The goal
 
 ## Closed-loop success rates
 
-Success rates (%) follow the paper’s main comparison. Segmented means average the six horizons from 25 to 150 steps. Values after ± are sample standard deviations across evaluation groups.
+Success rates (%) use the released FCP checkpoints and their matched priors. Segmented means average the six horizons from 25 to 150 steps. Values after ± are sample standard deviations across evaluation groups.
 
 | Method | PushT full task | PushT segmented mean | Cube segmented mean | LIBERO Scene2 | LIBERO Caddy | AntMaze D3 | FourRoom H75 | FourRoom H100 | FourRoom H125 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| FCP-True | **86.82** | **90.72 ± 0.67** | **90.22 ± 1.77** | 61.33 ± 3.06 | 66.00 ± 5.29 | **96.00 ± 2.00** | **100.00** | **100.00** | 54.00 |
-| FCP-Generated | 83.18 | 90.11 ± 1.42 | 89.61 ± 0.51 | **70.67 ± 1.15** | **74.67 ± 1.15** | 89.33 ± 4.62 | 80.00 | 98.00 | **56.00** |
+| FCP-True | **86.82** | **90.72 ± 0.67** | **90.22 ± 1.77** | 61.33 ± 3.06 | 66.00 ± 5.29 | **97.33 ± 1.15** | **100.00** | **100.00** | 48.00 |
+| FCP-Generated | 83.18 | 90.11 ± 1.42 | 89.61 ± 0.51 | **70.67 ± 1.15** | **74.67 ± 1.15** | 89.33 ± 4.62 | 84.00 | 90.00 | **52.00** |
 | SAGE | 46.59 | 74.72 ± 1.54 | 82.00 ± 0.58 | 48.67 ± 1.15 | 58.00 ± 7.21 | — | — | — | — |
 | H-JEPA | 35.00 | 48.22 ± 0.92 | 46.89 ± 2.47 | — | — | 70.00 ± 8.00 | 96.00 | 26.00 | 0.00 |
 | HWM | 34.77 | 52.61 ± 1.13 | 52.39 ± 1.42 | — | — | 36.00 ± 3.46 | **100.00** | 4.00 | 0.00 |
+
+AntMaze and FourRoom use the SAGE action priors retrained on November 22. [Navigation task counts and seeds](USAGE.md#navigation-weights-and-evaluation)
 
 ## Quick start
 
@@ -67,7 +69,7 @@ python -m fcp.closed_loop.pusht --variant true --trials 193
 
 Encode each demonstration split with the matching frozen world model. Save `latents` and `episode_offsets` in `train_episodes.npz` and `val_episodes.npz`. The offsets mark each episode start and the final frame count. Save the start and goal frame indices for each split in `train_pairs.npy` and `val_pairs.npy`. Use the same preparation step for your test split. [Frozen models and demonstration data](ASSETS.md)
 
-Train one future-context generator (FCG), then fit a future-guided subgoal solver (FGSS) for each condition. True uses the demonstrated future during training. Generated uses predictions from the frozen FCG.
+Train one future-context generator (FCG), then fit a future-guided subgoal solver (FGSS) for each condition. True uses the demonstrated future during training. Generated uses one prediction per window from the frozen FCG, cached before training.
 
 ```bash
 for split in train val; do
@@ -78,10 +80,17 @@ done
 python -m fcp.train --environment pusht --stage fcg \
   --train train.npz --val val.npz --output fcg.pt
 
-for variant in true generated; do
-  python -m fcp.train --environment pusht --stage fgss --condition "$variant" \
-    --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output "${variant}.pt"
+for split in train val; do
+  python -m fcp.generate --environment pusht --output-kind future --split "$split" \
+    --checkpoint fcg.pt --data "${split}.npz" --output "${split}_future.npz"
 done
+
+python -m fcp.train --environment pusht --stage fgss --condition true \
+  --fcg-checkpoint fcg.pt --val-future-cache val_future.npz \
+  --train train.npz --val val.npz --output true.pt
+python -m fcp.train --environment pusht --stage fgss --condition generated \
+  --fcg-checkpoint fcg.pt --future-cache train_future.npz --val-future-cache val_future.npz \
+  --train train.npz --val val.npz --output generated.pt
 ```
 
 Pass `--checkpoint true.pt` or `--checkpoint generated.pt` to the generation or evaluation command to use the corresponding locally trained solver.
@@ -106,14 +115,14 @@ python -m priors.train --environment pusht --variant true \
 
 Repeat the cache and training steps for Generated with `--variant generated`, `--checkpoint generated.pt` on the cache command, and separate output directories. To deploy the trained True pair in PushT, add `--checkpoint true.pt --prior-root prior_runs/pusht_true` to the closed-loop command.
 
-[Input formats and simulator versions](USAGE.md) · [Prior dimensions and training settings](priors/README.md)
+[Evaluation commands, seeds, and simulator versions](USAGE.md) · [Prior dimensions and training settings](priors/README.md)
 
 ## Repository layout
 
 ```text
 FCP/
 ├── fcp/                  # FCG/FGSS models, data, training, generation, and evaluation
-│   └── closed_loop/      # Action search and native PushT evaluation
+│   └── closed_loop/      # Native benchmark evaluation and action search
 ├── priors/               # Action-prior model, data, cache, training, and weights
 ├── media/                # Project videos and animated previews
 ├── USAGE.md              # Commands and simulator setup

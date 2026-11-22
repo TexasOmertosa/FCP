@@ -9,12 +9,12 @@ import numpy as np
 import torch
 from safetensors.torch import save_file
 from torch import distributed as dist
-from torch.nn.attention import SDPBackend, sdpa_kernel
 from torch.nn.parallel import DistributedDataParallel
 
 from priors.config import ACTION_BLOCK, ACTION_TOKENS, DRAWS, EPOCHS, LIBERO, architecture
 from priors.data import PriorRows, load_condition, normalization
 from priors.model import ActionPrior
+from fcp.numerics import PRIOR_TRAIN, PRIOR_VAL
 from fcp.release import CONFIGS, sha256_file
 
 
@@ -41,12 +41,17 @@ def fit_epoch(network, model, optimizer, rows, local, stats, settings, epoch, ra
         batches = (order[k:k + batch_size] for k in range(0, len(order), batch_size))
     totals = torch.zeros(2, device=device, dtype=torch.float64)
     network.train()
-    amp = env != 'cube' and device.type == 'cuda'
-    with sdpa_kernel(SDPBackend.MATH) if amp else torch.enable_grad():
+    numerics = PRIOR_TRAIN[env]
+    with numerics.backend(device):
         for indices in batches:
             args, kwargs, target = forward_args(rows.batch(local, indices, stats, device))
-            with torch.autocast(device.type, enabled=amp, dtype=torch.bfloat16):
-                nll, best_l1 = model.loss_terms(network(*args, **kwargs), target)
+            with numerics.autocast(device):
+                prediction = network(*args, **kwargs)
+                if env not in LIBERO:
+                    nll, best_l1 = model.loss_terms(prediction, target)
+                    loss = nll + 0.05 * best_l1
+            if env in LIBERO:
+                nll, best_l1 = model.loss_terms({key: value.float() for key, value in prediction.items()}, target)
                 loss = nll + 0.05 * best_l1
             if not torch.isfinite(loss):
                 raise FloatingPointError('Nonfinite action-prior loss.')
@@ -68,19 +73,18 @@ def validate(model, rows, local, stats, env, device):
     model.eval()
     use_best_samples = env in LIBERO
     rng = torch.Generator(device=device).manual_seed(1209)
-    amp = env != 'cube' and device.type == 'cuda'
+    numerics = PRIOR_VAL[env]
     total = 0.
     size = 256 if use_best_samples else 128
     for start in range(0, rows.size, size):
         indices = np.arange(start, min(rows.size, start + size))
         args, kwargs, target = forward_args(rows.batch(local, indices, stats, device))
-        if use_best_samples:
-            samples = model.sample(*args, num_samples=128, generator=rng, **kwargs)
-            metric = (samples - target[:, None]).abs().mean(dim=(-1, -2)).min(1).values.mean()
-        else:
-            with sdpa_kernel(SDPBackend.MATH) if amp else torch.no_grad():
-                with torch.autocast(device.type, enabled=amp, dtype=torch.bfloat16):
-                    metric, _ = model.loss_terms(model(*args, **kwargs), target)
+        with numerics.forward(device):
+            if use_best_samples:
+                samples = model.sample(*args, num_samples=128, generator=rng, **kwargs)
+                metric = (samples - target[:, None]).abs().mean(dim=(-1, -2)).min(1).values.mean()
+            else:
+                metric, _ = model.loss_terms(model(*args, **kwargs), target)
         if not torch.isfinite(metric):
             raise FloatingPointError('Nonfinite prior validation metric.')
         total += metric.item() * len(indices)
@@ -114,9 +118,6 @@ def run(args, device, rank, world):
     config = architecture(env)
     tensors = {key: torch.tensor(value, device=device) for key, value in stats.items()}
     torch.manual_seed(args.seed)
-    torch.backends.cuda.matmul.allow_tf32 = False
-    torch.backends.cudnn.allow_tf32 = False
-    torch.backends.mha.set_fastpath_enabled(False)
     model = ActionPrior(**config).to(device)
     network = DistributedDataParallel(model, device_ids=[device.index]) if world > 1 else model
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -134,7 +135,10 @@ def run(args, device, rank, world):
                 save_best(args.output, model,
                           dict(environment=env, variant=args.variant, epoch=epoch, validation_metric=selection,
                                validation_value=best, model_config=config, normalization=stats,
-                               upper_sha256=train_meta['upper_sha256'], train=train_meta, val=val_meta))
+                               upper_sha256=train_meta['upper_sha256'], train=train_meta, val=val_meta,
+                               seed=args.seed, batch_size=args.batch_size, epochs=args.epochs,
+                               train_numerics=PRIOR_TRAIN[env].metadata(device),
+                               val_numerics=PRIOR_VAL[env].metadata(device)))
             print(json.dumps(dict(epoch=epoch, train_loss=loss, **{f'val_{selection}': metric})), flush=True)
         if world > 1:
             dist.barrier()

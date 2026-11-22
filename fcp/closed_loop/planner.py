@@ -1,5 +1,7 @@
 """Execute the FCP closed loop with an environment's frozen control backend."""
 
+from contextlib import nullcontext
+
 import torch
 
 
@@ -50,7 +52,7 @@ def search(backend, target, goal, horizon, terminal, protocol, generator):
 
 
 @torch.no_grad()
-def run_episode(model, backend, task, protocol, device, seed, samples):
+def run_episode(model, backend, task, protocol, device, seed, samples, numerics=None):
     goal_array, budget, success = backend.reset(task)
     goal = torch.as_tensor(goal_array, dtype=torch.float32, device=device)
     if goal.ndim != 1 or budget < 1:
@@ -67,7 +69,9 @@ def run_episode(model, backend, task, protocol, device, seed, samples):
             target = goal
         else:
             history = torch.as_tensor(backend.history(), dtype=torch.float32, device=device)
-            target = model.sample(history[None], goal[None], samples=samples, generator=noise)[0]
+            precision = numerics.forward(device, model) if numerics else nullcontext()
+            with precision:
+                target = model.sample(history[None], goal[None], samples=samples, generator=noise)[0]
         actions = search(backend, target, goal, horizon, terminal, protocol, action_noise)
         executable = list(backend.actions_for_execution(actions))
         if len(executable) != horizon:

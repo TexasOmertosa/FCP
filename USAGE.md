@@ -21,7 +21,7 @@ Each environment shares one future-context generator (FCG) and has two future-gu
 | [`fcp/data.py`](fcp/data.py), [`fcp/prepare.py`](fcp/prepare.py) | Construct and load windows from frozen demonstration latents. |
 | [`fcp/train.py`](fcp/train.py), [`fcp/generate.py`](fcp/generate.py) | Train the two upper stages or generate future contexts and subgoals. |
 | [`fcp/evaluate.py`](fcp/evaluate.py), [`fcp/metrics.py`](fcp/metrics.py) | Evaluate prediction error or run a supplied closed-loop adapter. |
-| [`fcp/closed_loop/`](fcp/closed_loop) | Action search and native PushT full-task evaluation. |
+| [`fcp/closed_loop/`](fcp/closed_loop) | Native PushT, Cube, Scene2, and Caddy evaluation and a general controller interface. |
 | [`fcp/release.py`](fcp/release.py), [`fcp/selected_models.json`](fcp/selected_models.json) | Resolve asset revisions and benchmark settings. |
 | [`priors/`](priors) | Build expert action windows, cache FCP conditions, and train the matching action prior. |
 
@@ -35,22 +35,52 @@ python -m fcp.prepare --environment pusht --episodes episodes.npz --pairs pairs.
 
 Use separate episode arrays and index pairs for validation and test. The public benchmark task data provide fixed evaluation inputs. Training requires demonstration data, split indices, and the corresponding frozen encoder. [Original downloads](ASSETS.md)
 
-The resulting encoded NPZ windows contain `history` in `[N,D]` or `[N,T,D]`, `goal` and `subgoal` in `[N,D]`, and `future` in `[N,3,D]`. Generation only reads `history` and `goal`. For a window starting at `t` and ending at `g`, use `u=min(t+10,g)` for the subgoal and `u+(j*(g-u)+2)//4` for future indices `j=1,2,3`. Three-frame histories use offsets −10, −5, and 0, clipped to the episode start. The LIBERO latent order is external view followed by wrist view. PushT, Cube and AntMaze use the current observation only. Scene2, Caddy and FourRoom use three observations.
+The resulting encoded NPZ windows contain `history` in `[N,D]` or `[N,T,D]`, `goal` and `subgoal` in `[N,D]`, and `future` in `[N,3,D]`. Generation reads `history` and `goal`. In the common window constructor, a start `t` and goal `g` give subgoal index `u=min(t+10,g)` and future indices `u+(j*(g-u)+2)//4` for `j=1,2,3`. Three-frame histories use offsets −10, −5, and 0, clipped to the episode start. The LIBERO latent order is external view followed by wrist view. PushT, Cube and AntMaze use the current observation only. Scene2, Caddy and FourRoom use three observations. For a run with saved labels, pass its exact frame indices via `--target-indices` or use its encoded NPZ directly.
 
 ## Train, generate, and test
 
-Train a shared FCG first and reuse that checkpoint for both FGSS variants.
+Train a shared FCG first. Freeze it and cache one generated future per window. Train FGSS-True on demonstrated futures and FGSS-Generated on the fixed Train cache. Select both FGSS checkpoints by prediction error under generated validation conditions and share the Val cache across variants.
 
 ```bash
 python -m fcp.train --environment pusht --stage fcg --train train.npz --val val.npz --output fcg.pt
-python -m fcp.train --environment pusht --stage fgss --condition true --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output true.pt
-python -m fcp.train --environment pusht --stage fgss --condition generated --fcg-checkpoint fcg.pt --train train.npz --val val.npz --output generated.pt
+python -m fcp.generate --environment pusht --output-kind future --split train --checkpoint fcg.pt --data train.npz --output train_future.npz
+python -m fcp.generate --environment pusht --output-kind future --split val --checkpoint fcg.pt --data val.npz --output val_future.npz
+python -m fcp.train --environment pusht --stage fgss --condition true --fcg-checkpoint fcg.pt --val-future-cache val_future.npz --train train.npz --val val.npz --output true.pt
+python -m fcp.train --environment pusht --stage fgss --condition generated --fcg-checkpoint fcg.pt --future-cache train_future.npz --val-future-cache val_future.npz --train train.npz --val val.npz --output generated.pt
 
 python -m fcp.generate --environment pusht --variant generated --data test.npz --output subgoals.npz
 python -m fcp.evaluate --environment pusht --variant generated --data test.npz --samples 1 8
 ```
 
-Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. Otherwise the commands download the selected release from its pinned Hugging Face revision. To cache Generated training conditions, use `python -m fcp.generate --output-kind future --checkpoint fcg.pt --data train.npz` and pass its output to `python -m fcp.train --future-cache`. The trainer checks the cache against the exact training split and FCG checkpoint.
+Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. The default is the selected release from the pinned Hugging Face revision. The trainer checks the cache against the encoded split and FCG checkpoint. For four-GPU training, replace `python -m fcp.train` with `torchrun --standalone --nproc-per-node=4 -m fcp.train`. The batch size is global and defaults to 65,536. The upper optimizer uses AdamW with learning rate `1e-3`, weight decay `1e-4`, five warm-up epochs, cosine decay to `1e-6`, and gradient clipping at 1. Use the original splits, frozen latents, and training records when comparing checkpoints from scratch. The released weights give a fixed starting point for evaluating the reported models.
+
+### Training and evaluation seeds
+
+| Environment | Upper training window shuffle | Action-prior training | Native evaluation |
+|---|---:|---:|---|
+| PushT | 148 | 149 | 42 for full440. 22, 32, 42 for the six segmented horizons, with 100 tasks per seed and horizon. |
+| Cube | 148 | 149 | 22, 32, 42, with 100 tasks per seed and horizon. |
+| Scene2 | 217 for FCG, 218 for both FGSS models | 218 | Groups 8501, 8502, 8503, 50 tasks each. The fixed query manifest records individual physical reset seeds. |
+| Caddy | 217 for FCG, 218 for both FGSS models | 218 | Three fixed groups of 50 queries. The fixed query manifest records individual physical reset seeds. |
+| AntMaze | 42 | 149 | 42, 43, 44, with 50 D3 tasks per seed. |
+| FourRoom | 44 | 149 | Base seed 42, with 50 tasks each at H75, H100 and H125. |
+
+The LIBERO native controller keys its proposal stream as `base + 1009 * query_index + 17 * elapsed`, with base 20260829 for Scene2 and 42 for Caddy. The LIBERO FCG and FGSS initialization seeds are 314159 and 314160. Their training-noise streams start at 1000220 and 1000221. The open-loop evaluation CLI defaults to seed 1209. Training checkpoints, evaluation outputs, and cache manifests record the effective seeds.
+
+### CUDA numerical settings
+
+Parameters, velocity losses, Euler states, and averages of complete draws use FP32. The table gives the upper-model forward and the prior train/Val precision. CUDA attention and TF32 settings are implemented in [`fcp/numerics.py`](fcp/numerics.py).
+
+| Environment | Upper train | Upper deploy | Upper for action-prior cache | Prior train / Val |
+|---|---|---|---|---|
+| PushT | BF16 / automatic SDPA | BF16 / efficient self, Flash cross | BF16 / efficient self, Flash cross | BF16 / BF16, Math |
+| Cube | BF16 / efficient self, Flash cross | FP32 / native MHA and SDPA | FP32 / native MHA and SDPA | FP32 / FP32, native MHA and SDPA |
+| Scene2 | BF16 / Math | FP32 / Math | BF16 / Math | BF16 / FP32, Math |
+| Caddy | BF16 / Math | BF16 / Math | BF16 / Math | BF16 / FP32, Math |
+| AntMaze | BF16 / Math | BF16 / Math | BF16 / Math | FP32 / FP32, Math |
+| FourRoom | BF16 / Flash | BF16 / Flash | BF16 / Flash | FP32 / FP32, Math |
+
+The CPU path uses FP32. Use the specified CUDA and simulator versions for comparisons with the archived GPU runs.
 
 ## Train the action prior
 
@@ -80,11 +110,47 @@ sed -n 's/^# pusht: //p' requirements.txt | xargs python -m pip install -r requi
 python -m fcp.closed_loop.pusht --variant true --trials 193 --output runs/pusht_trial193.json
 ```
 
-Omit `--trials` for all 440 tasks. Use `--variant generated` for the other FCP configuration. The runner downloads the pinned task set, FCP weights, action prior, and official LeWM checkpoint. It loads each task's recorded start and goal, averages eight complete FCG→FGSS draws, scores the prior's action proposals with LeWM, and replans after each executed action segment. The output includes the first step with block coverage above 0.85 and the first native pose match. The native runner replans from the current observations. In the release check, trial 193 succeeded in 94 actions on an A100. The archived video records 110 actions for that trial. [Frozen PushT LeWM checkpoint](https://huggingface.co/quentinll/lewm-pusht/tree/22b330c28c27ead4bfd1888615af1340e3fe9052)
+Omit `--trials` for all 440 tasks. Use `--variant generated` for the other configuration. The runner downloads the pinned task set, FCP weights, matched action prior, and official LeWM checkpoint. It preserves the original 16-task evaluation batches, including when reporting a single trial. It averages eight complete FCG→FGSS draws and uses the prior as the first bank in 30 rounds of CEM with 300 candidates and 30 elites. The output gives the first step above 0.85 coverage and the first native pose match. `--trace` includes the executed actions and the upper subgoals. [Frozen PushT LeWM checkpoint](https://huggingface.co/quentinll/lewm-pusht/tree/22b330c28c27ead4bfd1888615af1340e3fe9052)
+
+An A100 rerun of both full440 variants reproduced all 880 archived first-hit records. FCP-True completed 382/440 tasks (86.82%) and FCP-Generated completed 366/440 tasks (83.18%).
+
+## Native Cube and LIBERO evaluation
+
+Extract the linked demonstration archives and use the corresponding simulator packages in [`requirements.txt`](requirements.txt). For Cube, run each horizon (25, 50, 75, 100, 125, 150) with each evaluation seed (22, 32, 42) and variant.
+
+```bash
+python -m fcp.closed_loop.cube --variant true --horizon 25 --seed 22 \
+  --dataset /path/to/cube_single_expert.h5 --output runs/cube_true_H25_seed22.json
+```
+
+Each Cube cell evaluates 100 fixed tasks in ten-task batches. Use `--chunk 0` to check the first ten tasks. The cell counts native zero-step successes and uses an action budget of `2H`. The last 30 actions target the final observation. The last search plans a ten-action segment. [Fixed Cube task manifest](fcp/closed_loop/cube_tasks.json)
+
+For LIBERO, use the extracted suite evaluation directory containing `episodes/` and local SAGE and LIBERO source checkouts. The runner uses the pinned SAGE lower model and applies the recorded per-query OpenBLAS kernel and reset seeds. For EGL, set `MUJOCO_EGL_DEVICE_ID` to the physical rendering device when restricting CUDA visibility. Keep the LIBERO runtime separate from PushT and Cube so that Transformers and MuJoCo match the recorded versions.
+
+```bash
+python -m fcp.closed_loop.libero --environment scene2 --variant true \
+  --dataset /path/to/libero_scene2_evaluation --sage-root /path/to/SAGE \
+  --libero-root /path/to/LIBERO --output runs/scene2_true.json
+```
+
+Use `--environment caddy` with the Caddy archive. Use `--trials 1` to check one query. At each decision the matched prior proposes 64 plans, including its top mode. The frozen two-view lower model scores the plans once. Native success stops execution immediately. The 150-query summaries report success and the sample standard deviation over three groups of 50. The native PushT, Cube, and LIBERO commands take `--checkpoint` and `--prior-root` to evaluate a locally trained pair and its matching prior. [Fixed Scene2 and Caddy query manifests](fcp/closed_loop/libero_tasks.json)
+
+In the release check, the ten Cube H25 tasks in the first seed-22 batch matched the archived first-hit steps. The tested Scene2 and Caddy queries matched their archived outcomes and execution lengths. Their action traces diverged after the first segment. The release check covered one LIBERO query per suite.
+
+## Navigation weights and evaluation
+
+The released AntMaze and FourRoom checkpoints are paired with individually retrained SAGE Transformer-GMM priors from November 22. The table gives the archived native reruns for those exact priors.
+
+| Variant | AntMaze D3 | FourRoom H75 | FourRoom H100 | FourRoom H125 |
+|---|---:|---:|---:|---:|
+| FCP-True | 146/150, 97.33 ± 1.15% | 50/50, 100% | 50/50, 100% | 24/50, 48% |
+| FCP-Generated | 134/150, 89.33 ± 4.62% | 42/50, 84% | 45/50, 90% | 26/50, 52% |
+
+Running these two evaluations requires the two exact retrained lower checkpoints and the corresponding native controllers from the project archive. The asset list identifies their paths and checksums. [Navigation model and task assets](ASSETS.md#frozen-lower-models)
 
 ## Connect other simulators
 
-The general closed-loop entry point is `python -m fcp.evaluate --environment <key> --variant <variant> --backend module:factory`. Cube, Scene2, Caddy, AntMaze, and FourRoom require a native adapter that supplies the matching frozen encoder and dynamics, exact task reset and success rules, and action-prior inference. The benchmark settings in [`fcp/selected_models.json`](fcp/selected_models.json) provide the published search sizes, evaluation seeds, and action budgets. The source links give the exact checkpoints and task inputs. [Download checkpoints and data](ASSETS.md)
+The general closed-loop entry point is `python -m fcp.evaluate --environment <key> --variant <variant> --backend module:factory`. This interface lets a caller supply a simulator, frozen encoder and dynamics, native task reset and success rules, and action-prior inference. Use the native commands above for the corresponding paper evaluation protocols. [Asset sources](ASSETS.md)
 
 The backend factory receives `(environment, variant, backend_config, device)` and implements the following methods.
 

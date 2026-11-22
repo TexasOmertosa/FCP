@@ -11,10 +11,11 @@ from .closed_loop.planner import run_episode
 from .data import read_windows
 from .metrics import evaluate
 from .model import load_checkpoint
+from .numerics import UPPER_DEPLOYMENT
 from .release import CONFIGS, load_selected
 
 
-def closed_loop(model, args, device, protocol):
+def closed_loop(model, args, device, protocol, numerics):
     module, separator, name = args.backend.partition(':')
     if not separator:
         raise ValueError('Use --backend module:factory.')
@@ -28,7 +29,7 @@ def closed_loop(model, args, device, protocol):
     for draws in args.samples:
         for index, task in enumerate(tasks):
             success, steps = run_episode(model, backend, task, protocol, device,
-                                         args.seed + index, draws)
+                                         args.seed + index, draws, numerics=numerics)
             rows.append(dict(task_index=index, draws=draws, success=success, steps=steps))
         counts[draws] = sum(row['success'] for row in rows if row['draws'] == draws)
     return dict(tasks_per_setting=len(tasks), successes=counts,
@@ -61,6 +62,7 @@ def main():
     if args.backend and args.samples != [spec['main_table_complete_draws']]:
         parser.error('The released closed-loop configuration uses eight complete samples.')
     device = torch.device(args.device)
+    numerics = UPPER_DEPLOYMENT[args.environment]
     if args.checkpoint:
         model, cp = load_checkpoint(args.checkpoint, device, 'fgss')
         if (cp['config'] != spec['architecture'] or cp['environment'] != args.environment
@@ -75,11 +77,13 @@ def main():
         if any(spec['architecture'][key] != value for key, value in shape.items()):
             raise ValueError('Evaluation window dimensions do not match the selected environment.')
         loader = DataLoader(windows, batch_size=args.batch_size)
-        results = dict(windows=len(windows),
-                       per_coordinate_mse=evaluate(model, loader, device, args.samples, args.seed))
+        with numerics.forward(device, model):
+            results = dict(windows=len(windows),
+                           per_coordinate_mse=evaluate(model, loader, device, args.samples, args.seed))
     else:
-        results = closed_loop(model, args, device, spec['protocol'])
-    print(json.dumps(dict(environment=args.environment, variant=args.variant, **results),
+        results = closed_loop(model, args, device, spec['protocol'], numerics)
+    print(json.dumps(dict(environment=args.environment, variant=args.variant, seed=args.seed,
+                          numerics=numerics.metadata(device), **results),
                      indent=2, allow_nan=False))
 
 

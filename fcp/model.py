@@ -22,6 +22,7 @@ class FlowBlock(nn.Module):
         nn.init.zeros_(self.modulation[-1].bias)
         self.future_projection = nn.Linear(width, width, bias=False) if inject_future else None
         self.attention_backends = (None, None)
+        self.separate_attention_projections = False
 
     def forward(self, nodes, memory, time_embedding, future_embedding, near_tokens):
         shifts_scales_gates = self.modulation(time_embedding).chunk(9, dim=-1)
@@ -36,7 +37,12 @@ class FlowBlock(nn.Module):
                 else:
                     attention, key = self.cross_attention, memory
                 with context:
-                    update, _ = attention(hidden, key, key, need_weights=False)
+                    if self.separate_attention_projections:
+                        # Independent views preserve the archived Q, K and V GEMM shapes.
+                        update = torch.cat([attention(q, k, v, need_weights=False)[0] for q, k, v in
+                                            zip(hidden.split(32768), key.split(32768), key.split(32768))])
+                    else:
+                        update, _ = attention(hidden, key, key, need_weights=False)
             else:
                 if self.future_projection is not None:
                     delta = 0.1 * self.future_projection(future_embedding)
@@ -59,6 +65,7 @@ class VelocityField(nn.Module):
         self.future_nodes = future_nodes
         self.solver = solver
         self.width = width
+        self.project_all_queries = False
         view_dim = latent_dim // views
         query_nodes = future_nodes + int(solver)
 
@@ -124,16 +131,16 @@ class VelocityField(nn.Module):
         for block in self.blocks:
             tokens = block(tokens, memory, time_embedding, future_embedding, self.views)
         output_tokens = output_nodes * self.views
-        if self.blocks[0].attention_backends[0] is not None:
+        if self.project_all_queries or self.blocks[0].attention_backends[0] is not None:
             # Native CUDA kernels project every query before reading the target.
             return self.output(tokens)[:, :output_tokens].reshape(batch, output_nodes, -1)
         return self.output(tokens[:, :output_tokens]).reshape(batch, output_nodes, -1)
 
 
-def _velocity_loss(field, history, goal, label, future):
+def _velocity_loss(field, history, goal, label, future, noise=None, time=None):
     label = label.float()
-    noise = torch.randn_like(label)
-    time = torch.rand(label.shape[0], device=label.device)
+    noise = torch.randn_like(label) if noise is None else noise
+    time = torch.rand(label.shape[0], device=label.device) if time is None else time
     interpolated = (1 - time[:, None, None]) * noise + time[:, None, None] * label
     memory, context = field.condition(history, goal, future)
     velocity = field(interpolated, time, memory, future, context)
@@ -151,7 +158,7 @@ def _integrate(field, history, goal, noise, future, steps):
 
 class FCP(nn.Module):
     def __init__(self, latent_dim, *, history_frames=1, views=1, future_nodes=3,
-                 width=512, depth=6, heads=8, ffn_width=2048, euler_steps=8):
+                 width=512, depth=6, heads=8, ffn_width=2048, euler_steps=8, solver_seed=None):
         super().__init__()
         if views < 1 or latent_dim < 1 or latent_dim % views:
             raise ValueError('Each view must have the same positive latent dimension.')
@@ -159,7 +166,10 @@ class FCP(nn.Module):
             raise ValueError('Require positive input and integration sizes and at least two blocks.')
         args = (latent_dim, history_frames, views, future_nodes, width, depth, heads, ffn_width)
         self.A = VelocityField(*args, solver=False)
-        self.B = VelocityField(*args, solver=True)
+        with torch.random.fork_rng(devices=[]) if solver_seed is not None else nullcontext():
+            if solver_seed is not None:
+                torch.random.default_generator.manual_seed(solver_seed)
+            self.B = VelocityField(*args, solver=True)
         self.future_nodes = future_nodes
         self.euler_steps = euler_steps
 
@@ -172,18 +182,31 @@ class FCP(nn.Module):
         return _velocity_loss(self.B, history, goal, demonstrated_subgoal[:, None],
                               future_condition.detach())
 
+    def forward(self, history, goal, label, noise, time, future_condition=None):
+        if future_condition is None:
+            return _velocity_loss(self.A, history, goal, label, None, noise, time)
+        return _velocity_loss(self.B, history, goal, label, future_condition.detach(), noise, time)
+
     @torch.no_grad()
     def generate_future(self, history, goal, *, generator=None):
         """Generate conditions with frozen A for FCP-Generated training."""
         noise = torch.randn((goal.shape[0], self.future_nodes, goal.shape[-1]),
                             device=goal.device, generator=generator)
+        return self.generate_future_from_noise(history, goal, noise)
+
+    @torch.no_grad()
+    def generate_future_from_noise(self, history, goal, noise):
         return _integrate(self.A, history, goal, noise, None, self.euler_steps)
+
+    @torch.no_grad()
+    def solve_from_noise(self, history, goal, noise, future):
+        return _integrate(self.B, history, goal, noise, future, self.euler_steps)[:, 0]
 
     @torch.no_grad()
     def sample_from_noise(self, history, goal, noise):
         """Run one complete draw from externally seeded subgoal and future noise."""
-        future = _integrate(self.A, history, goal, noise[:, 1:], None, self.euler_steps)
-        return _integrate(self.B, history, goal, noise[:, :1], future, self.euler_steps)[:, 0]
+        future = self.generate_future_from_noise(history, goal, noise[:, 1:])
+        return self.solve_from_noise(history, goal, noise[:, :1], future)
 
     @torch.no_grad()
     def sample(self, history, goal, *, samples=1, generator=None):

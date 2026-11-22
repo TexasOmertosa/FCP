@@ -23,8 +23,10 @@ huggingface_hub
 # pusht: numpy==2.2.6
 
 # Cube: stable-worldmodel==0.1.1, ogbench==1.2.1,
-#       mujoco==3.12.0, gymnasium==1.3.0
-# Scene2 and Caddy: LIBERO 0.1.0 from source, robosuite==1.4.0, mujoco==2.3.7
+#       mujoco==3.12.0, gymnasium==1.3.0, hdf5plugin, scikit-learn,
+#       torchvision==0.28.0, hydra-core==1.3.5, transformers==4.57.1
+# Scene2 and Caddy: SAGE and LIBERO 0.1.0 from source, robosuite==1.4.0,
+#                   mujoco==2.3.7, transformers==5.12.0, hdf5plugin
 # AntMaze: stable-worldmodel==0.1.1, mujoco==3.14.0, gymnasium==1.2.3
 # FourRoom: gymnasium==1.2.3 and the H-JEPA environment at commit 97054ec
 # Upstream source and checkpoint locations are listed in ASSETS.md.

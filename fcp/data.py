@@ -21,19 +21,25 @@ def window_indices(n_frames, boundaries, pairs):
     return current, goal, episode
 
 
-def make_windows(latents, boundaries, pairs, architecture):
+def make_windows(latents, boundaries, pairs, architecture, target_indices=None):
     if latents.ndim != 2 or latents.shape[1] != architecture['latent_dim']:
         raise ValueError('Expected per-frame latents [frames, latent_dim] for this environment.')
     current, goal, episode = window_indices(len(latents), boundaries, pairs)
     offsets = np.array((0,) if architecture['history_frames'] == 1 else (-10, -5, 0))
     history = np.maximum(current[:, None] + offsets, boundaries[episode, None])
-    subgoal = np.minimum(current + 10, goal)
-    future = subgoal[:, None] + ((goal - subgoal)[:, None] * np.arange(1, 4) + 2) // 4
+    if target_indices is None:
+        subgoal = np.minimum(current + 10, goal)
+        future = subgoal[:, None] + ((goal - subgoal)[:, None] * np.arange(1, 4) + 2) // 4
+    else:
+        nodes = architecture['future_nodes'] + 1
+        if (target_indices.shape != (len(current), nodes) or target_indices.dtype.kind not in 'iu'
+                or np.any(target_indices[:, 0] < current) or np.any(target_indices[:, -1] > goal)
+                or np.any(target_indices[:, 1:] < target_indices[:, :-1])):
+            raise ValueError('Target indices must be ordered frame positions inside each start-goal window.')
+        subgoal, future = target_indices[:, 0], target_indices[:, 1:]
     return {key: latents[index].astype(np.float32, copy=False)
             for key, index in (('history', history), ('goal', goal),
                                ('subgoal', subgoal), ('future', future))}
-
-
 
 def read_windows(path):
     """Load frozen latent windows and infer their model dimensions."""
