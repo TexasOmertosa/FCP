@@ -4,7 +4,7 @@
 
 [![FCP weights and action priors](https://img.shields.io/badge/Checkpoints-Hugging%20Face-ffc84a?logo=huggingface)](https://huggingface.co/stardust8979/FCP-weights) [![Evaluation datasets](https://img.shields.io/badge/Data-Evaluation-278060)](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks)
 
-[Installation](#installation) · [Checkpoints](#checkpoints) · [Data and splits](#data-and-splits) · [Seeds](#seeds) · [Training](#training) · [Evaluation](#evaluation)
+[Installation](#installation) · [Checkpoints](#checkpoints) · [Data](#data) · [Evaluation seeds](#evaluation-seeds) · [Training](#training) · [Evaluation](#evaluation)
 
 ## Overview
 
@@ -95,37 +95,31 @@ FCG is shared by FCP-True and FCP-Generated within each environment. Use the upp
 | AntMaze D3 | [Shared](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/fcg.safetensors) | [True](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/fgss_true.safetensors) · [Generated](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/fgss_generated.safetensors) | [True](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/action_prior_true.safetensors) · [Generated](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/action_prior_generated.safetensors) | [Upper config](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/config.json) · [Prior metadata](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/antmaze/action_priors.json) |
 | FourRoom | [Shared](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/fcg.safetensors) | [True](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/fgss_true.safetensors) · [Generated](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/fgss_generated.safetensors) | [True](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/action_prior_true.safetensors) · [Generated](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/action_prior_generated.safetensors) | [Upper config](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/config.json) · [Prior metadata](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/action_priors.json) |
 
-## Data and splits
+## Data
 
-Split counts are in train / validation / test order where applicable. The preparation commands read the fixed episode CSVs.
-
-| Environment | Demonstrations | Fixed episode split | Evaluation tasks |
-|---|---|---|---|
-| PushT | [`pusht_expert_train.h5.zst`](https://huggingface.co/datasets/quentinll/lewm-pusht/blob/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5.zst) | [CSV](data/splits/pusht_episode_split.csv), 14,948 / 1,868 / 1,869 | [Full440 task data and index](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks/tree/00ccb6c343e053aac5c079bb96e9ee396e8aef9b/pusht) |
-| Cube | [`cube_single_expert.tar.zst`](https://huggingface.co/datasets/quentinll/lewm-cube/blob/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.tar.zst) | [CSV](data/splits/cube_episode_split.csv), 8,000 / 1,000 / 1,000 | [Fixed episode IDs and start frames by seed and horizon](fcp/closed_loop/cube_tasks.json) |
-| Scene2 | [SAGE training archives](https://huggingface.co/datasets/CLTRAY/SAGE-data/tree/7e87e5b0fee414a70945a310d08e18d2f92cffba/training) | [CSV](data/splits/scene2_train_val_episode_index.csv), 8,000 / 1,000 | [Scene2 evaluation archive](https://huggingface.co/datasets/CLTRAY/SAGE-data/blob/7e87e5b0fee414a70945a310d08e18d2f92cffba/evaluation/libero_scene2_evaluation.tar) · [Fixed queries](fcp/closed_loop/libero_tasks.json) |
-| Caddy | [SAGE training archives](https://huggingface.co/datasets/CLTRAY/SAGE-data/tree/7e87e5b0fee414a70945a310d08e18d2f92cffba/training) | [CSV](data/splits/caddy_train_val_episode_index.csv), 8,000 / 1,000 | [Caddy evaluation archive](https://huggingface.co/datasets/CLTRAY/SAGE-data/blob/7e87e5b0fee414a70945a310d08e18d2f92cffba/evaluation/libero_caddy_evaluation.tar) · [Fixed queries](fcp/closed_loop/libero_tasks.json) |
-| AntMaze | [Train HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/visual_antmaze_medium_explore_stitch_train.h5) · [Val HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/visual_antmaze_medium_stitch_val.h5) | [CSV](data/splits/antmaze_episode_split.csv), 25,000 / 500 | [Original H-JEPA D3 tasks](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/eval_trajs/ant/expert_grid_d3_n50.pt) |
-| FourRoom | [Train HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/fourroom_tp35_d1.h5) · [Val HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/fourroom_tp35_d1_val.h5) | [CSV](data/splits/fourroom_episode_split.csv), 2,494 / 100 | [Original H-JEPA H75 tasks](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/eval_trajs/fourroom/fourroom_tp35_cross2_goal75_n50_d1.pt) · [FCP H100 and H125 task data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks/tree/00ccb6c343e053aac5c079bb96e9ee396e8aef9b/fourroom) |
+| Environment | Demonstrations | Evaluation tasks |
+|---|---|---|
+| PushT | [`pusht_expert_train.h5.zst`](https://huggingface.co/datasets/quentinll/lewm-pusht/blob/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5.zst) | [Full440 task data and index](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks/tree/00ccb6c343e053aac5c079bb96e9ee396e8aef9b/pusht) |
+| Cube | [`cube_single_expert.tar.zst`](https://huggingface.co/datasets/quentinll/lewm-cube/blob/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.tar.zst) | [Fixed episode IDs and start frames by seed and horizon](fcp/closed_loop/cube_tasks.json) |
+| Scene2 | [SAGE training archives](https://huggingface.co/datasets/CLTRAY/SAGE-data/tree/7e87e5b0fee414a70945a310d08e18d2f92cffba/training) | [Scene2 evaluation archive](https://huggingface.co/datasets/CLTRAY/SAGE-data/blob/7e87e5b0fee414a70945a310d08e18d2f92cffba/evaluation/libero_scene2_evaluation.tar) · [Fixed queries](fcp/closed_loop/libero_tasks.json) |
+| Caddy | [SAGE training archives](https://huggingface.co/datasets/CLTRAY/SAGE-data/tree/7e87e5b0fee414a70945a310d08e18d2f92cffba/training) | [Caddy evaluation archive](https://huggingface.co/datasets/CLTRAY/SAGE-data/blob/7e87e5b0fee414a70945a310d08e18d2f92cffba/evaluation/libero_caddy_evaluation.tar) · [Fixed queries](fcp/closed_loop/libero_tasks.json) |
+| AntMaze | [Train HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/visual_antmaze_medium_explore_stitch_train.h5) · [Val HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/visual_antmaze_medium_stitch_val.h5) | [Original H-JEPA D3 tasks](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/eval_trajs/ant/expert_grid_d3_n50.pt) |
+| FourRoom | [Train HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/fourroom_tp35_d1.h5) · [Val HDF5](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/fourroom_tp35_d1_val.h5) | [Original H-JEPA H75 tasks](https://huggingface.co/datasets/jepa-world-models/h-jepa/blob/cc05cb8d2aaf9aec0d5364d073c6369ff760b60b/eval_trajs/fourroom/fourroom_tp35_cross2_goal75_n50_d1.pt) · [FCP H100 and H125 task data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks/tree/00ccb6c343e053aac5c079bb96e9ee396e8aef9b/fourroom) |
 
 Use the [SAGE extraction instructions](https://huggingface.co/datasets/CLTRAY/SAGE-data#extract) for the multipart LIBERO archives.
 
-## Seeds
+## Evaluation seeds
 
-Training seeds below are the public defaults. Evaluation uses the listed seed groups or fixed task manifests.
+| Environment | Evaluation |
+|---|---|
+| PushT | Full task 42, 440 tasks. Segmented 22, 32, 42, 100 tasks per seed and horizon. |
+| Cube | 22, 32, 42, 100 tasks per seed and horizon. |
+| Scene2 | 150 fixed queries in groups seeded with 8501, 8502 and 8503, 50 per group. |
+| Caddy | 150 fixed queries in three groups of 50. Reset seeds are recorded per query. |
+| AntMaze D3 | 42, 43, 44, 50 tasks per seed. |
+| FourRoom | Base seed 42, 50 tasks per horizon for H75, H100 and H125. |
 
-| Environment | Split | FCG / FGSS | Action prior | Evaluation |
-|---|---|---|---:|---|
-| PushT | 42 | 148 / 148 | 149 | Full task 42, 440 tasks. Segmented 22, 32, 42, 100 tasks per seed and horizon. |
-| Cube | 42 | 148 / 148 | 149 | 22, 32, 42, 100 tasks per seed and horizon. |
-| Scene2 | Fixed episode CSV | 217 / 218 | 218 | 150 fixed queries in groups seeded with 8501, 8502 and 8503, 50 per group. |
-| Caddy | Fixed episode CSV | 217 / 218 | 218 | 150 fixed queries in three groups of 50. Reset seeds are recorded per query. |
-| AntMaze D3 | 42 for validation selection | 42 / 42 | 149 | 42, 43, 44, 50 tasks per seed. |
-| FourRoom | 0 | 44 / 44 | 149 | Base seed 42, 50 tasks per horizon for H75, H100 and H125. |
-
-Both LIBERO suites use PyTorch seed 42 for evaluation. The fixed query manifest records simulator reset seeds for both suites.
-
-The retrained AntMaze and FourRoom lower LeWM models use training seeds 42 and 44, respectively. Open-loop evaluation uses seed 1209 by default. Initialization, noise and cache seeds are set by the training and cache code.
+Both LIBERO suites use PyTorch seed 42 for evaluation. The fixed query manifest records simulator reset seeds for both suites. Open-loop evaluation defaults to seed 1209.
 
 ## Training
 

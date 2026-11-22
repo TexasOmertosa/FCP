@@ -35,10 +35,10 @@ The cache uses the selected release by default. Pass `--checkpoint <fgss.pt>` to
 
 Training uses AdamW for 30 epochs at a constant learning rate of `1e-4`, weight decay of `1e-4`, and gradient clipping at 1. The loss is trajectory negative log likelihood plus 0.05 times the lowest per-mode action L1 error. Each environment uses an eight-component mixture with a width-512, three-layer Transformer decoder and eight attention heads.
 
-| Environment | Global batch | Seed | Validation selection |
-|---|---:|---:|---|
-| PushT, Cube, AntMaze, FourRoom | 128 | 149 | Minimum trajectory NLL |
-| Scene2, Caddy | 1,024 | 218 | Minimum normalized action L1 over 128 samples per row, with validation seed 1209 |
+| Environment | Global batch | Validation selection |
+|---|---:|---|
+| PushT, Cube, AntMaze, FourRoom | 128 | Minimum trajectory NLL |
+| Scene2, Caddy | 1,024 | Minimum normalized action L1 over 128 samples per row |
 
 For Scene2 or Caddy distributed training, replace `python -m priors.train` with `torchrun --standalone --nproc-per-node=4 -m priors.train`. The batch size is global. By default, action and low-dimensional statistics are fitted from Train rows. Supply `--normalization stats.json` to reuse the exact Train-only scaler for an existing protocol. The schema matches the `normalization` field in the published environment's `action_priors.json`.
 

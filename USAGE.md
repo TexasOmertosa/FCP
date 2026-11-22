@@ -56,18 +56,18 @@ python -m fcp.evaluate --environment pusht --variant generated --data test.npz -
 
 Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. The default is the selected release from the pinned Hugging Face revision. The trainer checks the cache against the encoded split and FCG checkpoint. For four-GPU training, replace `python -m fcp.train` with `torchrun --standalone --nproc-per-node=4 -m fcp.train`. The batch size is global and defaults to 65,536. The upper optimizer uses AdamW with learning rate `1e-3`, weight decay `1e-4`, five warm-up epochs, cosine decay to `1e-6`, and gradient clipping at 1. Use the original splits, frozen latents, and training records when comparing checkpoints from scratch. The released weights give a fixed starting point for evaluating the reported models.
 
-### Training and evaluation seeds
+### Evaluation seeds
 
-| Environment | Upper training window shuffle | Action-prior training | Native evaluation |
-|---|---:|---:|---|
-| PushT | 148 | 149 | 42 for full440. 22, 32, 42 for the six segmented horizons, with 100 tasks per seed and horizon. |
-| Cube | 148 | 149 | 22, 32, 42, with 100 tasks per seed and horizon. |
-| Scene2 | 217 for FCG, 218 for both FGSS models | 218 | Groups 8501, 8502, 8503, 50 tasks each. The fixed query manifest records individual physical reset seeds. |
-| Caddy | 217 for FCG, 218 for both FGSS models | 218 | Three fixed groups of 50 queries. The fixed query manifest records individual physical reset seeds. |
-| AntMaze | 42 | 149 | 42, 43, 44, with 50 D3 tasks per seed. |
-| FourRoom | 44 | 149 | Base seed 42, with 50 tasks each at H75, H100 and H125. |
+| Environment | Native evaluation |
+|---|---|
+| PushT | 42 for full440. 22, 32, 42 for the six segmented horizons, with 100 tasks per seed and horizon. |
+| Cube | 22, 32, 42, with 100 tasks per seed and horizon. |
+| Scene2 | Groups 8501, 8502, 8503, 50 tasks each. The fixed query manifest records individual physical reset seeds. |
+| Caddy | Three fixed groups of 50 queries. The fixed query manifest records individual physical reset seeds. |
+| AntMaze | 42, 43, 44, with 50 D3 tasks per seed. |
+| FourRoom | Base seed 42, with 50 tasks each at H75, H100 and H125. |
 
-The LIBERO native controller keys its proposal stream as `base + 1009 * query_index + 17 * elapsed`, with base 20260829 for Scene2 and 42 for Caddy. The LIBERO FCG and FGSS initialization seeds are 314159 and 314160. Their training-noise streams start at 1000220 and 1000221. The open-loop evaluation CLI defaults to seed 1209. Training checkpoints, evaluation outputs, and cache manifests record the effective seeds.
+The open-loop evaluation CLI defaults to seed 1209.
 
 ## Train the action prior
 
