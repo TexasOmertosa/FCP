@@ -1,6 +1,7 @@
 """Two-stage Future-Context Planning on frozen observation latents."""
 
 import math
+from contextlib import nullcontext
 
 import torch
 from torch import nn
@@ -20,16 +21,22 @@ class FlowBlock(nn.Module):
         nn.init.zeros_(self.modulation[-1].weight)
         nn.init.zeros_(self.modulation[-1].bias)
         self.future_projection = nn.Linear(width, width, bias=False) if inject_future else None
+        self.attention_backends = (None, None)
 
     def forward(self, nodes, memory, time_embedding, future_embedding, near_tokens):
         shifts_scales_gates = self.modulation(time_embedding).chunk(9, dim=-1)
         for index, norm in enumerate(self.norms):
             shift, scale, gate = shifts_scales_gates[3 * index:3 * index + 3]
             hidden = norm(nodes) * (1 + scale[:, None]) + shift[:, None]
-            if index == 0:
-                update, _ = self.self_attention(hidden, hidden, hidden, need_weights=False)
-            elif index == 1:
-                update, _ = self.cross_attention(hidden, memory, memory, need_weights=False)
+            if index < 2:
+                backend = self.attention_backends[index]
+                context = nullcontext() if backend is None else torch.nn.attention.sdpa_kernel(backend)
+                if index == 0:
+                    attention, key = self.self_attention, hidden
+                else:
+                    attention, key = self.cross_attention, memory
+                with context:
+                    update, _ = attention(hidden, key, key, need_weights=False)
             else:
                 if self.future_projection is not None:
                     delta = 0.1 * self.future_projection(future_embedding)
@@ -116,7 +123,11 @@ class VelocityField(nn.Module):
         time_embedding = self.flow_time(torch.cat((phase.cos(), phase.sin()), dim=-1))
         for block in self.blocks:
             tokens = block(tokens, memory, time_embedding, future_embedding, self.views)
-        return self.output(tokens[:, :output_nodes * self.views]).reshape(batch, output_nodes, -1)
+        output_tokens = output_nodes * self.views
+        if self.blocks[0].attention_backends[0] is not None:
+            # Native CUDA kernels project every query before reading the target.
+            return self.output(tokens)[:, :output_tokens].reshape(batch, output_nodes, -1)
+        return self.output(tokens[:, :output_tokens]).reshape(batch, output_nodes, -1)
 
 
 def _velocity_loss(field, history, goal, label, future):
@@ -167,6 +178,12 @@ class FCP(nn.Module):
         noise = torch.randn((goal.shape[0], self.future_nodes, goal.shape[-1]),
                             device=goal.device, generator=generator)
         return _integrate(self.A, history, goal, noise, None, self.euler_steps)
+
+    @torch.no_grad()
+    def sample_from_noise(self, history, goal, noise):
+        """Run one complete draw from externally seeded subgoal and future noise."""
+        future = _integrate(self.A, history, goal, noise[:, 1:], None, self.euler_steps)
+        return _integrate(self.B, history, goal, noise[:, :1], future, self.euler_steps)[:, 0]
 
     @torch.no_grad()
     def sample(self, history, goal, *, samples=1, generator=None):

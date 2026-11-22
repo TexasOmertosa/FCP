@@ -8,9 +8,9 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+from evaluation import evaluate
 from fcp import FCP, load_checkpoint, read_windows
 from release import CONFIGS, sha256_file
-from test import evaluate
 
 
 def main():

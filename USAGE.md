@@ -1,6 +1,6 @@
 # FCP training, generation, and evaluation
 
-Training, generation, and evaluation code for the twelve released FCP configurations. Within each environment, FCP-True trains the solver on demonstrated futures and FCP-Generated trains it on frozen FCG predictions. Both use generated futures at inference.
+Each environment shares one future-context generator (FCG) and has two future-guided subgoal solvers (FGSS). FCP-True trains FGSS on demonstrated futures. FCP-Generated trains FGSS on frozen FCG predictions. Both use FCG predictions at deployment.
 
 | Environment | CLI key | Shared FCG | True FGSS | Generated FGSS |
 |---|---|---:|---:|---:|
@@ -11,11 +11,38 @@ Training, generation, and evaluation code for the twelve released FCP configurat
 | AntMaze D3 | `antmaze` | 175 | 181 | 275 |
 | FourRoom | `fourroom` | 200 | 197 | 195 |
 
-[Model weights](https://huggingface.co/stardust8979/FCP-weights) · [Evaluation task data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks)
+[Checkpoint and data sources](ASSETS.md) · [Evaluation task data](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks)
+
+## Repository layout
+
+| Entry point | Purpose |
+|---|---|
+| [`prepare.py`](prepare.py) | Build training or evaluation windows from a split of frozen demonstration latents. |
+| [`fcp.py`](fcp.py) | FCG and FGSS flow networks, training objectives, and Euler integration. |
+| [`train.py`](train.py) | Train FCG and then either FGSS variant. |
+| [`generate.py`](generate.py) | Generate future contexts for training or subgoals for inference. |
+| [`priors/prepare.py`](priors/prepare.py) and [`priors/cache.py`](priors/cache.py) | Align expert action windows and cache eight-draw FCP conditions. |
+| [`priors/model.py`](priors/model.py) and [`priors/train.py`](priors/train.py) | Train and export the matching action prior. |
+| [`test.py`](test.py) and [`evaluation.py`](evaluation.py) | Evaluate prediction error and run a supplied closed-loop backend. |
+| [`benchmarks/pusht.py`](benchmarks/pusht.py) | Run native PushT full-task evaluation with the frozen LeWM and the matching action prior. |
+| [`release.py`](release.py) and [`selected_models.json`](selected_models.json) | Resolve checkpoint and task revisions and select the environment protocol. |
+| [`reproduce.py`](reproduce.py) | Verify the released upper-model predictions on one reference window per environment. |
+
+## Data preparation
+
+Install `requirements.txt` in Python 3.10 or 3.11. Encode each split with the environment's frozen encoder. Create a file `episodes.npz` containing `latents` with shape `[total_frames, D]` and `episode_offsets` with the start of every episode plus the final frame count. Supply `pairs.npy` with integer start and goal row indices `[N, 2]` for that split.
+
+```bash
+python prepare.py --environment pusht --episodes episodes.npz --pairs pairs.npy --output train.npz
+```
+
+Use separate episode arrays and index pairs for validation and test. The public benchmark task data provide fixed evaluation inputs. Training requires demonstration data, split indices, and the corresponding frozen encoder. [Original downloads](ASSETS.md)
+
+The resulting encoded NPZ windows contain `history` in `[N,D]` or `[N,T,D]`, `goal` and `subgoal` in `[N,D]`, and `future` in `[N,3,D]`. Generation only reads `history` and `goal`. For a window starting at `t` and ending at `g`, use `u=min(t+10,g)` for the subgoal and `u+(j*(g-u)+2)//4` for future indices `j=1,2,3`. Three-frame histories use offsets −10, −5, and 0, clipped to the episode start. The LIBERO latent order is external view followed by wrist view. PushT, Cube and AntMaze use the current observation only. Scene2, Caddy and FourRoom use three observations.
 
 ## Train, generate, and test
 
-Use Python 3.11+ and install `requirements.txt`. Supply encoded NPZ windows with `history` in `[N,D]` or `[N,T,D]`, `goal` and `subgoal` in `[N,D]`, and `future` in `[N,3,D]`. Generation only reads `history` and `goal`. For a window starting at `t` and ending at `g`, use `u=min(t+10,g)` for the subgoal and `u+(j*(g-u)+2)//4` for future indices `j=1,2,3`. Three-frame histories use offsets −10, −5, and 0, clipped to the episode start. The LIBERO latent order is external view followed by wrist view.
+Train a shared FCG first and reuse that checkpoint for both FGSS variants.
 
 ```bash
 python train.py --environment pusht --stage fcg --train train.npz --val val.npz --output fcg.pt
@@ -27,6 +54,18 @@ python test.py --environment pusht --variant generated --data test.npz --samples
 ```
 
 Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. Otherwise the commands download the selected release from its pinned Hugging Face revision. To cache Generated training conditions, use `generate.py --output-kind future --checkpoint fcg.pt --data train.npz` and pass its output to `train.py --future-cache`. The trainer checks the cache against the exact training split and FCG checkpoint.
+
+## Train the action prior
+
+Follow the [action-prior training guide](priors/README.md) after fitting FCG and FGSS. The prior receives fixed eight-draw subgoal targets and is fitted separately for each FCP variant.
+
+## Verify the published predictions
+
+```bash
+python reproduce.py --verify-priors
+```
+
+This evaluates both training variants for all six environments on the included encoded reference windows. It compares one- and eight-draw predictions against fixed CPU reference errors, verifies the matching action-prior checksums, and samples candidate actions from each prior. Use `--environment <key>` to verify one environment or `--weights-root <directory>` to use a local mirror. The reference errors are for these six windows.
 
 ## Simulator versions
 
@@ -43,14 +82,25 @@ Training and open-loop evaluation use encoded windows. Closed-loop evaluation us
 
 PushT uses Pymunk for 2D physics. FourRoom implements its own 2D dynamics in the environment. For Cube, LIBERO, and AntMaze, match the MuJoCo version of the selected benchmark. See the upstream [Stable World-Model](https://github.com/galilai-group/stable-worldmodel), [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO), and [H-JEPA](https://github.com/kevinghst/H-JEPA/commit/97054ecaff83e13839195ec4b92d74c08a0127c5) projects for native environment sources.
 
-## Closed-loop evaluation
+## Native PushT evaluation
 
-Run `test.py --environment <key> --variant <variant> --backend module:factory`. The released setup averages eight complete FCG→FGSS draws and uses environment-specific action search. `selected_models.json` gives the defaults. The factory receives `(environment, variant, backend_config, device)` and connects the caller's simulator, frozen encoder and dynamics, and action prior. It supplies:
+Use the [PushT dependency file](requirements-pusht.txt) in a separate environment. The original full-task evaluation used Python 3.10, PyTorch 2.13.0 with CUDA 13.0, and an NVIDIA A100.
 
-- `tasks()` for the fixed task set and `reset(task)` returning `(goal_latent, budget, initial_success)`.
+```bash
+pip install -r requirements-pusht.txt
+python -m benchmarks.pusht --variant true --trials 193 --output runs/pusht_trial193.json
+```
+
+Omit `--trials` for all 440 tasks. Use `--variant generated` for the other FCP configuration. The runner downloads the pinned task set, FCP weights, action prior, and official LeWM checkpoint. It loads each task's recorded start and goal, averages eight complete FCG→FGSS draws, scores the prior's action proposals with LeWM, and replans after each executed action segment. The output includes the first step with block coverage above 0.85 and the first native pose match. The native runner replans from the current observations. In the release check, trial 193 succeeded in 94 actions on an A100. The archived video records 110 actions for that trial. [Frozen PushT LeWM checkpoint](https://huggingface.co/quentinll/lewm-pusht/tree/22b330c28c27ead4bfd1888615af1340e3fe9052)
+
+## Connect other simulators
+
+The general closed-loop entry point is `test.py --environment <key> --variant <variant> --backend module:factory`. Cube, Scene2, Caddy, AntMaze, and FourRoom require a native adapter that supplies the matching frozen encoder and dynamics, exact task reset and success rules, and action-prior inference. The benchmark settings in [`selected_models.json`](selected_models.json) provide the published search sizes, evaluation seeds, and action budgets. The source links give the exact checkpoints and task inputs. [Download checkpoints and data](ASSETS.md)
+
+The backend factory receives `(environment, variant, backend_config, device)` and implements the following methods.
+
+- `tasks()` for the fixed task set and `reset(task)` for the goal latent, action budget, and initial success flag.
 - `history()` for the latest encoded observation or history.
-- `propose(target, goal, horizon, count, terminal, rng)` to produce the matching prior's candidate action sequences in planner coordinates, with the prior mode included for LIBERO.
-- `rollout(actions)` to score candidates through frozen dynamics. FourRoom requires differentiable rollouts and bounded actions in `[-1,1]`.
-- `actions_for_execution(actions)` to convert and clip the selected segment in native coordinates and `step(action)` returning `(success, done)`.
-
-The standalone upper trainer and evaluator expose the method and selected checkpoints. Use the matching action-prior file and normalization from the model repository with the original environment backend.
+- `propose(target, goal, horizon, count, terminal, rng)` for the matching prior's candidate actions in planner coordinates. Include the prior mode among the LIBERO candidates.
+- `rollout(actions)` for the frozen world model's terminal latent per candidate. FourRoom's projected-gradient planner requires differentiable rollouts and bounded actions in `[-1,1]`.
+- `actions_for_execution(actions)` to convert the chosen action segment to the simulator's coordinates, followed by `step(action)` for the success and termination flags.

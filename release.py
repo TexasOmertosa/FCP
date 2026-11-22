@@ -1,7 +1,7 @@
 """Resolve only the six environment pairs in the published FCP checkpoint set."""
 
 import json
-from hashlib import file_digest
+from hashlib import sha256
 from pathlib import Path
 
 from fcp import load_fcp
@@ -11,8 +11,41 @@ CONFIGS = REGISTRY['environments']
 
 
 def sha256_file(path):
+    digest = sha256()
     with Path(path).open('rb') as stream:
-        return file_digest(stream, 'sha256').hexdigest()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def resolve_file(filename, *, dataset=False):
+    """Fetch one artifact at the pinned model or task revision."""
+    from huggingface_hub import hf_hub_download
+
+    kind = 'task' if dataset else 'model'
+    return Path(hf_hub_download(
+        REGISTRY[f'{kind}_repo'],
+        filename,
+        revision=REGISTRY[f'{kind}_revision'],
+        repo_type='dataset' if dataset else 'model',
+    ))
+
+
+def prior_assets(environment, variant, weights_root=None):
+    metadata_name = f'{environment}/action_priors.json'
+    if weights_root is None:
+        meta_file = resolve_file(metadata_name)
+    else:
+        meta_file = Path(weights_root) / metadata_name
+    metadata = json.loads(meta_file.read_text())[variant]
+    filename = f"{environment}/{metadata['file']}"
+    if weights_root is None:
+        checkpoint = resolve_file(filename)
+    else:
+        checkpoint = Path(weights_root) / filename
+    if sha256_file(checkpoint) != metadata['weight_sha256']:
+        raise ValueError(f'The {environment} {variant} action prior has the wrong checksum.')
+    return checkpoint, metadata
 
 
 def load_selected(environment, variant, device, weights_root=None):

@@ -7,28 +7,10 @@ import json
 import torch
 from torch.utils.data import DataLoader
 
+from evaluation import evaluate
 from fcp import load_checkpoint, read_windows
 from planner import run_episode
 from release import CONFIGS, load_selected
-
-
-@torch.no_grad()
-def evaluate(model, loader, device, counts, seed, future_only=False):
-    model.eval()
-    noise = torch.Generator(device=device).manual_seed(seed)
-    totals = {count: 0.0 for count in counts}
-    coordinates = 0
-    for history, goal, subgoal, future in loader:
-        history, goal = history.to(device), goal.to(device)
-        target = (future if future_only else subgoal).to(device)
-        predict = model.generate_future if future_only else model.sample
-        draws = torch.stack([predict(history, goal, generator=noise)
-                             for _ in range(max(counts))])
-        for count in counts:
-            prediction = draws[:count].mean(dim=0)
-            totals[count] += (prediction.double() - target).square().sum().item()
-        coordinates += target.numel()
-    return {count: total / coordinates for count, total in totals.items()}
 
 
 def closed_loop(model, args, device, protocol):

@@ -1,0 +1,56 @@
+{
+  "pusht_full": {
+    "task": 193,
+    "first_success_step": 110,
+    "first_success_frame_index": 220,
+    "frames": 622,
+    "fps": 20,
+    "frames_after_success": 401,
+    "video_sha256": "a57a21f4db796efea6f6ce00ae4634a725879512666739e0fd9e2ca137cd2229"
+  },
+  "antmaze_D3": {
+    "task": 1,
+    "first_success_step": 213,
+    "first_success_frame_index": 213,
+    "frames": 234,
+    "fps": 20,
+    "frames_after_success": 20,
+    "video_sha256": "885be4c64a3602d2c0ce647a4caf15d87143a5a924f12ca310ed4fca436c366a"
+  },
+  "fourroom_H125": {
+    "task": 1,
+    "first_success_step": 229,
+    "first_success_frame_index": 458,
+    "frames": 479,
+    "fps": 20,
+    "frames_after_success": 20,
+    "video_sha256": "001928b9c08645d6f29c7827026d237e82100306c9690bd2509aab3804f741c2"
+  },
+  "cube_H150": {
+    "task": 6,
+    "first_success_step": 72,
+    "first_success_frame_index": 72,
+    "frames": 93,
+    "fps": 20,
+    "frames_after_success": 20,
+    "video_sha256": "ec14eba11a9195d400efcee36d960414f8d5f1c1f63bfa7bc24c8824b2372bc6"
+  },
+  "scene2": {
+    "task": 1,
+    "first_success_step": 226,
+    "first_success_frame_index": 226,
+    "frames": 247,
+    "fps": 20,
+    "frames_after_success": 20,
+    "video_sha256": "4155af2391b319166c84cb20791c2f5845cbd49c0e77b81e22da575eab0efdde"
+  },
+  "caddy": {
+    "task": 14,
+    "first_success_step": 215,
+    "first_success_frame_index": 215,
+    "frames": 236,
+    "fps": 20,
+    "frames_after_success": 20,
+    "video_sha256": "58dfac48da4347fede239d47c4c3042c0b4b6a694832ebc9c317a3fc20b97d8e"
+  }
+}
