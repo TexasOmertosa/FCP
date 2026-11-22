@@ -27,6 +27,16 @@ FCP predicts future states in the world model's latent space and uses them to se
 
 ## PushT: two routes from one start and goal
 
+### Guided near the fork
+
+Both rollouts start from the same state just before the fork. The frames below each rollout supply its future context for the first plan.
+
+![PushT left and right guidance with the three input frames under each rollout](media/previews/pusht_guided_near_fork.gif)
+
+[Context frames and rollout data](media/pusht_guided_near_fork.npz)
+
+### Sampled from the task start
+
 FCP samples different future contexts for the first plan and then replans closed loop. From the same start and goal, five of eight runs take the left route and three take the right. The lines trace the T-block center. The two displayed runs reach the goal coverage threshold at steps 175 and 246.
 
 ![PushT left and right routes produced by FCP from the same start and goal](media/previews/pusht_sampled_routes.gif)

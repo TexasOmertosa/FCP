@@ -130,5 +130,23 @@
     "fps": 20,
     "video_sha256": "eff2e22997e45ec15d07714f7bf4a36a90be4e0cb70289e7ed2910fc0aececa3",
     "gif_sha256": "53ac4ab7609009b1b9d9788bfa7a39f7706f4abcb3dea9bca8ed0d93e66931a9"
+  },
+  "pusht_guided_near_fork": {
+    "task_episode": 15706,
+    "seed": 42,
+    "branch_step": 50,
+    "context_frames": [
+      62,
+      67,
+      72
+    ],
+    "first_goal_hit": {
+      "left": 161,
+      "right": 230
+    },
+    "frames": 285,
+    "fps": 20,
+    "video_sha256": "07b26a3d3a39c7038b8e7d87aa3f70e54166684816ba38d919a146ddf9d6d0ac",
+    "gif_sha256": "acbef6f6a896c218758c2515c6f52023e9da2b6ff270f4d3b63b120b39902f43"
   }
 }
