@@ -29,9 +29,9 @@ FCP predicts future states in the world model's latent space and uses them to se
 
 Both rollouts share the same start (frame 0) and goal. FCP uses the future frames shown below each rollout to plan its first push, leading to different routes.
 
-![PushT left and right guidance with the three input frames under each rollout](media/previews/pusht_guided_near_fork.gif)
+![PushT left and right guidance with the three input frames under each rollout](media/previews/pusht_guided_frame0.gif)
 
-[Context frames and rollout data](media/pusht_guided_near_fork.npz)
+[Context frames and rollout data](media/pusht_guided_frame0.npz)
 
 ## Closed-loop success rates
 
