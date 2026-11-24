@@ -30,6 +30,7 @@ FCG is shared by FCP-True and FCP-Generated within each environment. The loader 
 | FourRoom | [Shared](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/fcg.safetensors) | [True](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/fgss_true.safetensors) · [Generated](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/fgss_generated.safetensors) | [True](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/action_prior_true.safetensors) · [Generated](https://huggingface.co/stardust8979/FCP-weights/blob/fb370f8f99e46183af641b6639f5dc85974ea067/fourroom/action_prior_generated.safetensors) | [Model and planner config](fcp/selected_models.json) |
 
 [PushT full440 and FourRoom H100/H125 evaluation tasks](https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks/tree/00ccb6c343e053aac5c079bb96e9ee396e8aef9b).
+[Regenerate the FourRoom extensions](REPRODUCIBILITY.md#regenerate-fourroom-h100-and-h125-tasks).
 
 ## Original demonstrations and benchmark tasks
 

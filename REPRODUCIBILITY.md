@@ -42,3 +42,51 @@ The action-prior proposal RNG is also fixed by the native runners. LIBERO uses `
 All selected FCP evaluations average eight complete FCG→FGSS samples. Keep the model-specific precision, attention settings and normalization in the code and configuration.
 
 Use the commands in [Usage](USAGE.md). AntMaze and FourRoom require a native navigation backend implementing the documented simulator interface.
+
+## Regenerate FourRoom H100 and H125 tasks
+
+The generator runs the deterministic H-JEPA expert in a fresh simulator. It
+takes a continuous window of exactly 100 or 125 actions whose endpoints are
+three doors apart along the shortest path. Each released split contains 50
+tasks, rendered with one active distractor. The first and last frames are the
+start and goal images. Generation uses no Train or Val trajectories. H75 uses
+the original H-JEPA task set.
+
+From the FCP repository root, check out the simulator and install its
+[dependencies](https://github.com/kevinghst/H-JEPA/tree/97054ecaff83e13839195ec4b92d74c08a0127c5#1-installation)
+in a Python 3.11 environment.
+
+```bash
+git clone https://github.com/kevinghst/H-JEPA.git ../H-JEPA
+git -C ../H-JEPA checkout 97054ecaff83e13839195ec4b92d74c08a0127c5
+python -m pip install -e '../H-JEPA[train,env]'
+```
+
+To regenerate the **released tasks**, download their JSON manifests and rerun
+the expert with the recorded resets and crop indices. The reference HDF5
+files and model weights are optional for this step.
+
+```bash
+mkdir -p evaluation_tasks
+tasks_url=https://huggingface.co/datasets/stardust8979/FCP-evaluation-tasks/resolve/00ccb6c343e053aac5c079bb96e9ee396e8aef9b/fourroom
+for horizon in 100 125; do
+  curl -fsSL "$tasks_url/H$horizon.json" -o "evaluation_tasks/H$horizon.json"
+  python scripts/generate_fourroom_tasks.py --hjepa-root ../H-JEPA \
+    --horizon "$horizon" --manifest "evaluation_tasks/H$horizon.json" \
+    --output "regenerated/H$horizon.h5"
+done
+```
+
+To **sample a new split**, omit the manifest and choose a sampling seed.
+The released splits used seed 3072. H125 screens candidate lengths with the
+same ego dynamics before rendering the full rollout.
+
+```bash
+python scripts/generate_fourroom_tasks.py --hjepa-root ../H-JEPA \
+  --horizon 125 --seed 3073 --num-tasks 50 --output generated/H125.h5
+```
+
+Both commands write trajectory groups and a JSON task list alongside the HDF5
+file. Each group contains `H + 1` observations and `H` actions. The model
+gets 280 environment steps to solve H100 and 350 to solve H125. Use the
+published manifests for a direct comparison with the reported results.
