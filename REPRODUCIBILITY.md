@@ -39,3 +39,7 @@ The public GitHub revision `f41ee0d` was cloned into a fresh directory and exerc
 - A two-window PushT open-loop evaluation was run twice with the same seed. Reported MSEs were identical. A one-epoch FCG/FGSS-True/FGSS-Generated training smoke run was also repeated: all three resulting checkpoint SHA-256 hashes matched between runs.
 
 The release check covers representative native evaluation tasks and repeated short training runs. AntMaze and FourRoom evaluation also requires the corresponding native navigation controllers. [Navigation evaluation setup](USAGE.md#navigation-weights-and-evaluation)
+
+## Selected navigation solver update
+
+AntMaze and FourRoom selected FCP results now both use matched SAGE-prior CEM300/30/30. [Verified counts, source receipts, prior hashes and budgets](results/navigation_cem/README.md). FourRoom replaces its previous GradientSolver results; AntMaze retains its matching CEM results. All other environment and baseline protocols remain unchanged.

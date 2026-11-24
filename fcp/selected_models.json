@@ -389,10 +389,9 @@
       "main_table_complete_draws": 8,
       "protocol": {
         "name": "FourRoom",
-        "optimizer": "gradient",
-        "candidates": 50,
-        "search_iterations": 90,
-        "action_learning_rate": 0.08,
+        "optimizer": "cem",
+        "candidates": 300,
+        "search_iterations": 30,
         "final_segment": 10,
         "budgets_by_horizon": {
           "75": 210,
@@ -404,7 +403,10 @@
           42
         ],
         "segment": 10,
-        "terminal_goal_steps": 30
+        "terminal_goal_steps": 30,
+        "elites": 30,
+        "action_bounds_required": true,
+        "cost_backend_required": true
       },
       "action_priors": {
         "true": {

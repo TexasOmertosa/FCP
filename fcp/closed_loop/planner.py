@@ -6,6 +6,11 @@ import torch
 
 
 def terminal_cost(backend, actions, target):
+    if hasattr(backend, 'cost'):
+        costs = backend.cost(actions, target)
+        if costs.shape != (len(actions),):
+            raise ValueError('The native cost must return one value per candidate.')
+        return costs
     endpoints = backend.rollout(actions)
     if endpoints.shape != (len(actions), target.numel()):
         raise ValueError('The world model must return one terminal latent per candidate.')
@@ -20,26 +25,19 @@ def search(backend, target, goal, horizon, terminal, protocol, generator):
             or candidates.device != target.device):
         raise ValueError('Expected the configured action bank [candidates, horizon, action_dim].')
     method = protocol['optimizer']
-    if method == 'gradient':
-        with torch.enable_grad():
-            actions = candidates.detach().clone().requires_grad_(True)
-            optimizer = torch.optim.AdamW([actions], lr=protocol['action_learning_rate'])
-            for _ in range(protocol['search_iterations']):
-                optimizer.zero_grad(set_to_none=True)
-                loss = terminal_cost(backend, actions, target).sum()
-                actions.grad, = torch.autograd.grad(loss, actions)
-                optimizer.step()
-                with torch.no_grad():
-                    actions.clamp_(-1, 1)
-        with torch.no_grad():
-            return actions[terminal_cost(backend, actions, target).argmin()].detach()
 
     with torch.no_grad():
         if method == 'rank':
             return candidates[terminal_cost(backend, candidates, target).argmin()]
         if method != 'cem':
             raise ValueError(f'Unknown planner {method}.')
+        if protocol.get('action_bounds_required') and not hasattr(backend, 'bound_actions'):
+            raise ValueError('This protocol requires backend.bound_actions for every CEM candidate.')
+        if protocol.get('cost_backend_required') and not hasattr(backend, 'cost'):
+            raise ValueError('This protocol requires the native backend.cost reduction.')
         for i in range(protocol['search_iterations']):
+            if hasattr(backend, 'bound_actions'):
+                candidates = backend.bound_actions(candidates)
             ordered = terminal_cost(backend, candidates, target).topk(protocol['elites'], largest=False)
             elites = candidates[ordered.indices]
             mean = elites.mean(dim=0)

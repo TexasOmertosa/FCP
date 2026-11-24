@@ -140,12 +140,12 @@ In the release check, the ten Cube H25 tasks in the first seed-22 batch matched 
 
 ## Navigation weights and evaluation
 
-The released AntMaze and FourRoom checkpoints are paired with individually retrained SAGE Transformer-GMM priors from November 22. The table gives the archived native reruns for those exact priors.
+The released AntMaze and FourRoom checkpoints are paired with individually retrained SAGE Transformer-GMM priors from November 22. The table gives the verified CEM results for those exact priors: AntMaze uses its archived CEM run, and FourRoom uses the November 23 CEM rerun. Both use 300 candidates, 30 rounds, and 30 elites; no prior was retrained for this solver comparison.
 
 | Variant | AntMaze D3 | FourRoom H75 | FourRoom H100 | FourRoom H125 |
 |---|---:|---:|---:|---:|
-| FCP-True | 146/150, 97.33 ± 1.15% | 50/50, 100% | 50/50, 100% | 24/50, 48% |
-| FCP-Generated | 134/150, 89.33 ± 4.62% | 42/50, 84% | 45/50, 90% | 26/50, 52% |
+| FCP-True | 146/150, 97.33 ± 1.15% | 49/50, 98% | 50/50, 100% | 26/50, 52% |
+| FCP-Generated | 134/150, 89.33 ± 4.62% | 44/50, 88% | 45/50, 90% | 27/50, 54% |
 
 Download the retrained LeWM checkpoint and normalizer for each navigation environment. Evaluating the native protocol also requires the corresponding navigation controller. See the backend interface below. [Navigation lower models](ASSETS.md#frozen-lower-models) · [FCP and action priors](ASSETS.md#fcp-and-action-priors)
 
@@ -158,5 +158,7 @@ The backend factory receives `(environment, variant, backend_config, device)` an
 - `tasks()` for the fixed task set and `reset(task)` for the goal latent, action budget, and initial success flag.
 - `history()` for the latest encoded observation or history.
 - `propose(target, goal, horizon, count, terminal, rng)` for the matching prior's candidate actions in planner coordinates. Include the prior mode among the LIBERO candidates.
-- `rollout(actions)` for the frozen world model's terminal latent per candidate. FourRoom's projected-gradient planner requires differentiable rollouts and bounded actions in `[-1,1]`.
+- `rollout(actions)` for the frozen world model's terminal latent per candidate. FourRoom uses bounded CEM: the backend must implement `bound_actions(actions)` to clamp every candidate in planner coordinates to the normalized equivalent of physical actions in `[-1,1]`. Preserve the native cost (including its last-two-prediction reduction and configured intermediate weight) through `cost(actions, target)`. AntMaze keeps its original action-space handling.
 - `actions_for_execution(actions)` to convert the chosen action segment to the simulator's coordinates, followed by `step(action)` for the success and termination flags.
+
+The GitHub `fcp/selected_models.json` is authoritative for the selected evaluation protocol. The pinned Hugging Face files retain their historical export metadata; the FourRoom solver override changes no model tensor or normalization statistic. See [verified CEM results](results/navigation_cem/README.md).
