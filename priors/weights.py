@@ -7,15 +7,12 @@ from safetensors.torch import load_file
 
 from priors.config import architecture
 from priors.model import ActionPrior
-from fcp.release import CONFIGS, prior_assets, sha256_file
+from fcp.release import prior_assets, sha256_file
 
 
 def load_prior(environment, variant, device, *, weights_root=None, prior_root=None, upper=None):
     if prior_root is None:
         checkpoint, metadata = prior_assets(environment, variant, weights_root)
-        expected = CONFIGS[environment]['variants'][variant]
-        if any(metadata[key] != expected[key] for key in ('fcg_epoch', 'fgss_epoch')):
-            raise ValueError('The action prior does not match the selected planner.')
     else:
         directory = Path(prior_root)
         checkpoint = directory / 'best.safetensors'

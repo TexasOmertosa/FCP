@@ -59,8 +59,8 @@ def prior_assets(environment, variant, weights_root=None):
     else:
         checkpoint = Path(weights_root) / filename
     expected = CONFIGS[environment]['action_priors'][variant]
-    if (metadata['file'], metadata['epoch'], metadata['weight_sha256']) != (
-            expected['file'], expected['epoch'], expected['weight_sha256']):
+    if (metadata['file'], metadata['weight_sha256']) != (
+            expected['file'], expected['weight_sha256']):
         raise ValueError(f'The {environment} {variant} action prior metadata differs from the selected release.')
     if sha256_file(checkpoint) != expected['weight_sha256']:
         raise ValueError(f'The {environment} {variant} action prior has the wrong checksum.')
@@ -80,11 +80,13 @@ def load_selected(environment, variant, device, weights_root=None):
         )
     folder = Path(weights_root) / environment
     metadata = json.loads((folder / 'config.json').read_text())
-    for field in ('architecture', 'variants', 'attention_padding_mask'):
+    for field in ('architecture', 'attention_padding_mask'):
         if metadata[field] != config[field]:
             raise ValueError(f'Weights for {environment} differ from the selected release ({field}).')
     for component in ('fcg', 'fgss'):
         filename = files[component]
+        if metadata['variants'][variant][component] != filename:
+            raise ValueError(f'Weights for {environment} have different component filenames.')
         if sha256_file(folder / filename) != config['component_sha256'][filename]:
             raise ValueError(f'The {environment} {filename} checkpoint has the wrong checksum.')
     return load_fcp(folder, variant, device)

@@ -18,16 +18,10 @@
       },
       "variants": {
         "true": {
-          "fcg_epoch": 191,
-          "fgss_epoch": 139,
-          "source_checkpoint_sha256": "6b596afe01666906c8c51cdcb057e6f1582cb70a430a75aa08243d7235e2719b",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_true.safetensors"
         },
         "generated": {
-          "fcg_epoch": 191,
-          "fgss_epoch": 280,
-          "source_checkpoint_sha256": "89cc7960f60a04b3d468a6f62514b0d3a50579b05d7553059e8d9641902af575",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_generated.safetensors"
         }
@@ -64,15 +58,11 @@
       "action_priors": {
         "true": {
           "file": "action_prior_true.safetensors",
-          "epoch": 30,
-          "weight_sha256": "df4e1f5736e56c2dfe183a9a2356b4bd79cc36cc33575d61d358ee6f49cd85db",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "df4e1f5736e56c2dfe183a9a2356b4bd79cc36cc33575d61d358ee6f49cd85db"
         },
         "generated": {
           "file": "action_prior_generated.safetensors",
-          "epoch": 29,
-          "weight_sha256": "b66a9d0e0521210590618628a98be0c2c5ed231131d46ae23f2d531f67c9ac3f",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "b66a9d0e0521210590618628a98be0c2c5ed231131d46ae23f2d531f67c9ac3f"
         }
       },
       "component_sha256": {
@@ -95,16 +85,10 @@
       },
       "variants": {
         "true": {
-          "fcg_epoch": 163,
-          "fgss_epoch": 114,
-          "source_checkpoint_sha256": "975de7cc605e635a968741c3906f5b9a65e3b09fa064488fde21d6bfcef3994a",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_true.safetensors"
         },
         "generated": {
-          "fcg_epoch": 163,
-          "fgss_epoch": 78,
-          "source_checkpoint_sha256": "835d120838595272ab84cbda5a31dd4563bc8b90de9ddeb633f5ba17bc673868",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_generated.safetensors"
         }
@@ -138,15 +122,11 @@
       "action_priors": {
         "true": {
           "file": "action_prior_true.safetensors",
-          "epoch": 15,
-          "weight_sha256": "c84111ce8e48c78188e97fb0292aabc0c75a5e24432e0e92e1cfc10e3ca70a3c",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "c84111ce8e48c78188e97fb0292aabc0c75a5e24432e0e92e1cfc10e3ca70a3c"
         },
         "generated": {
           "file": "action_prior_generated.safetensors",
-          "epoch": 10,
-          "weight_sha256": "71514d5d0c100c0deebb162a91ef9c41cd5db966a8289dc54e973fba194bcb0e",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "71514d5d0c100c0deebb162a91ef9c41cd5db966a8289dc54e973fba194bcb0e"
         }
       },
       "component_sha256": {
@@ -169,17 +149,11 @@
       },
       "variants": {
         "true": {
-          "fcg_epoch": 187,
-          "fgss_epoch": 198,
-          "source_checkpoint_sha256": "015c4f13c6a6b20a77b2f3cb1a0c4347fe6f2bfe9f83c8a61bdcb77ca53d0888",
           "fcg_source_checkpoint_sha256": "2765349fed9fa3ccc0a3139b5158a9326dbd8682d7c0df2808951c0cac0b12e2",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_true.safetensors"
         },
         "generated": {
-          "fcg_epoch": 187,
-          "fgss_epoch": 185,
-          "source_checkpoint_sha256": "2765349fed9fa3ccc0a3139b5158a9326dbd8682d7c0df2808951c0cac0b12e2",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_generated.safetensors"
         }
@@ -207,15 +181,11 @@
       "action_priors": {
         "true": {
           "file": "action_prior_true.safetensors",
-          "epoch": 30,
-          "weight_sha256": "151eecb827b573ae81dc21ddd99dbdeb884f3ed1321c8d67b66f6435b0415f93",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "151eecb827b573ae81dc21ddd99dbdeb884f3ed1321c8d67b66f6435b0415f93"
         },
         "generated": {
           "file": "action_prior_generated.safetensors",
-          "epoch": 30,
-          "weight_sha256": "2fbfd3699d64a19eba58f482afd2d14fb83bcd2403c981f5b4b777b6c4b27de5",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "2fbfd3699d64a19eba58f482afd2d14fb83bcd2403c981f5b4b777b6c4b27de5"
         }
       },
       "component_sha256": {
@@ -238,16 +208,10 @@
       },
       "variants": {
         "true": {
-          "fcg_epoch": 154,
-          "fgss_epoch": 197,
-          "source_checkpoint_sha256": "5dbd6cfaead93e04dee688fcc7c6298d1a1e5196f1efa9379dc22019c73a1aa6",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_true.safetensors"
         },
         "generated": {
-          "fcg_epoch": 154,
-          "fgss_epoch": 178,
-          "source_checkpoint_sha256": "a1f283cbdcd2247e98f4a7a1fcc55ca728015fe1782706116e532a5c034ba917",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_generated.safetensors"
         }
@@ -270,15 +234,11 @@
       "action_priors": {
         "true": {
           "file": "action_prior_true.safetensors",
-          "epoch": 29,
-          "weight_sha256": "cae3da1da37642bb3884fc39f46821c3c3ac775808f597c004b67612696acbfa",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "cae3da1da37642bb3884fc39f46821c3c3ac775808f597c004b67612696acbfa"
         },
         "generated": {
           "file": "action_prior_generated.safetensors",
-          "epoch": 29,
-          "weight_sha256": "69e6470f0a18c33d5647a6d553706379236a32f7ff08892cc9f2b82e6fa0ee2d",
-          "evaluation_release": "main comparison"
+          "weight_sha256": "69e6470f0a18c33d5647a6d553706379236a32f7ff08892cc9f2b82e6fa0ee2d"
         }
       },
       "component_sha256": {
@@ -301,16 +261,10 @@
       },
       "variants": {
         "true": {
-          "fcg_epoch": 175,
-          "fgss_epoch": 181,
-          "source_checkpoint_sha256": "96358c301f68bd46585bbf62c837ba8229e455000c81d5ab654f02ecd6ee81ac",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_true.safetensors"
         },
         "generated": {
-          "fcg_epoch": 175,
-          "fgss_epoch": 275,
-          "source_checkpoint_sha256": "23729c0d861d769c009cc64787c673aa6b8eee7a6360ae1db4a3a3c6237db50b",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_generated.safetensors"
         }
@@ -339,15 +293,11 @@
       "action_priors": {
         "true": {
           "file": "action_prior_true.safetensors",
-          "epoch": 11,
-          "weight_sha256": "f9d505804246e9236fa13e2f49293f355178468580606f40ce220a89ae1699a3",
-          "evaluation_release": "2026-11-22"
+          "weight_sha256": "f9d505804246e9236fa13e2f49293f355178468580606f40ce220a89ae1699a3"
         },
         "generated": {
           "file": "action_prior_generated.safetensors",
-          "epoch": 8,
-          "weight_sha256": "3109161d21bc798761f9d2415251aa3000eadfad5fcaf3c41586fc39d7828ec1",
-          "evaluation_release": "2026-11-22"
+          "weight_sha256": "3109161d21bc798761f9d2415251aa3000eadfad5fcaf3c41586fc39d7828ec1"
         }
       },
       "component_sha256": {
@@ -370,16 +320,10 @@
       },
       "variants": {
         "true": {
-          "fcg_epoch": 200,
-          "fgss_epoch": 197,
-          "source_checkpoint_sha256": "3421285c9ad5614a90d6aeea394baf891c3d7f918aa87f756f3ff2b3b9a24027",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_true.safetensors"
         },
         "generated": {
-          "fcg_epoch": 200,
-          "fgss_epoch": 195,
-          "source_checkpoint_sha256": "cc1f1def3d8259648497b563ab84f1decff2731c5d9664d741479115e11f40bc",
           "fcg": "fcg.safetensors",
           "fgss": "fgss_generated.safetensors"
         }
@@ -411,15 +355,11 @@
       "action_priors": {
         "true": {
           "file": "action_prior_true.safetensors",
-          "epoch": 30,
-          "weight_sha256": "88f0e8bbe6629d8bb726040aa2d3139a05b2d230a9da074df86c86159ab4a1ad",
-          "evaluation_release": "2026-11-22"
+          "weight_sha256": "88f0e8bbe6629d8bb726040aa2d3139a05b2d230a9da074df86c86159ab4a1ad"
         },
         "generated": {
           "file": "action_prior_generated.safetensors",
-          "epoch": 30,
-          "weight_sha256": "8e965455e9ba3932cf798a88f1962824c8b243f0b7c402e307cb7d9a76f038cd",
-          "evaluation_release": "2026-11-22"
+          "weight_sha256": "8e965455e9ba3932cf798a88f1962824c8b243f0b7c402e307cb7d9a76f038cd"
         }
       },
       "component_sha256": {

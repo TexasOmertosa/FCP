@@ -1,8 +1,8 @@
 # Reproducibility
 
-This page lists the release inputs, evaluation settings, and verification scope.
+Use the following weights, datasets and settings to evaluate the released models.
 
-## Immutable release inputs
+## Weights and datasets
 
 | Input | Pinned source |
 |---|---|
@@ -29,17 +29,16 @@ Use the preparation commands and training defaults in the repository. To reconst
 
 The action-prior proposal RNG is also fixed by the native runners. LIBERO uses `base + 1009 * query_index + 17 * elapsed`, with base 20260829 for Scene2 and 42 for Caddy. The selected model configuration records complete-draw counts and planner settings.
 
-## Verification performed
+## Action planning
 
-The public GitHub revision `f41ee0d` was cloned into a fresh directory and exercised with its published checkpoint and task downloads on an A100. Checks completed:
+| Environment | Action selection | Execution |
+|---|---|---|
+| PushT | Matched prior + CEM, 300 candidates, 30 rounds, 30 elites | 10 steps; last30 uses final goal; terminal5+5 |
+| Cube | Matched prior + CEM, 300 candidates, 30 rounds, 30 elites | 10 steps; last30 uses final goal; terminal10 |
+| AntMaze | Matched SAGE prior + CEM, 300 candidates, 30 rounds, 30 elites | 10 steps; last30 uses final goal; terminal5+5; budget350 |
+| FourRoom | Matched SAGE prior + bounded CEM, 300 candidates, 30 rounds, 30 elites | 10 steps; last30 uses final goal; terminal10; budgets210/280/350 |
+| Scene2, Caddy | 64 matched-prior candidates, ranked once by the frozen world model | 10 steps; last30 uses final goal |
 
-- PushT True, full-task query 193: the runner loaded all assets and returned the archived task outcome (success; 110 executed actions).
-- Cube True, H25, seed 22, first 10-task batch: the runner loaded the public task and weight assets and completed all ten tasks.
-- Scene2 True query 1 and Caddy True query 28: both native LIBERO runners loaded the fixed query and simulator assets and completed. Scene2 succeeded in 226 actions; Caddy reached its 370-action budget without success, matching the recorded per-query outcome.
-- A two-window PushT open-loop evaluation was run twice with the same seed. Reported MSEs were identical. A one-epoch FCG/FGSS-True/FGSS-Generated training smoke run was also repeated: all three resulting checkpoint SHA-256 hashes matched between runs.
+All selected FCP evaluations average eight complete FCG→FGSS samples. Keep the model-specific precision, attention settings and normalization in the code and configuration.
 
-The release check covers representative native evaluation tasks and repeated short training runs. AntMaze and FourRoom evaluation also requires the corresponding native navigation controllers. [Navigation evaluation setup](USAGE.md#navigation-weights-and-evaluation)
-
-## Selected navigation solver update
-
-AntMaze and FourRoom selected FCP results now both use matched SAGE-prior CEM300/30/30. [Verified counts, source receipts, prior hashes and budgets](results/navigation_cem/README.md). FourRoom replaces its previous GradientSolver results; AntMaze retains its matching CEM results. All other environment and baseline protocols remain unchanged.
+Use the commands in [Usage](USAGE.md). AntMaze and FourRoom require a native navigation backend implementing the documented simulator interface.

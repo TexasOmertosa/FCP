@@ -54,7 +54,7 @@ python -m fcp.generate --environment pusht --variant generated --data test.npz -
 python -m fcp.evaluate --environment pusht --variant generated --data test.npz --samples 1 8
 ```
 
-Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. The default is the selected release from the pinned Hugging Face revision. The trainer checks the cache against the encoded split and FCG checkpoint. For four-GPU training, replace `python -m fcp.train` with `torchrun --standalone --nproc-per-node=4 -m fcp.train`. The batch size is global and defaults to 65,536. The upper optimizer uses AdamW with learning rate `1e-3`, weight decay `1e-4`, five warm-up epochs, cosine decay to `1e-6`, and gradient clipping at 1. Use the original splits, frozen latents, and training records when comparing checkpoints from scratch. The released weights give a fixed starting point for evaluating the reported models.
+Use `--checkpoint generated.pt` with the last two commands for a locally fitted solver. The default is the selected release from the pinned Hugging Face revision. The trainer checks the cache against the encoded split and FCG checkpoint. For four-GPU training, replace `python -m fcp.train` with `torchrun --standalone --nproc-per-node=4 -m fcp.train`. The batch size is global and defaults to 65,536. The upper optimizer uses AdamW with learning rate `1e-3`, weight decay `1e-4`, five warm-up epochs, cosine decay to `1e-6`, and gradient clipping at 1. Use the same data splits, frozen latents, and hyperparameters when training from scratch. The released weights give a fixed starting point for evaluating the reported models.
 
 ### Evaluation seeds
 
@@ -99,7 +99,6 @@ python -m fcp.closed_loop.pusht --variant true --trials 193 --output runs/pusht_
 
 Omit `--trials` for all 440 tasks. Use `--variant generated` for the other configuration. The runner downloads the pinned task set, FCP weights, matched action prior, and official LeWM checkpoint. It preserves the original 16-task evaluation batches, including when reporting a single trial. It averages eight complete FCG→FGSS draws and uses the prior as the first bank in 30 rounds of CEM with 300 candidates and 30 elites. The output gives the first step above 0.85 coverage and the first native pose match. `--trace` includes the executed actions and the upper subgoals. [Frozen PushT LeWM checkpoint](https://huggingface.co/quentinll/lewm-pusht/tree/22b330c28c27ead4bfd1888615af1340e3fe9052)
 
-An A100 rerun of both full440 variants reproduced all 880 archived first-hit records. FCP-True completed 382/440 tasks (86.82%) and FCP-Generated completed 366/440 tasks (83.18%).
 
 ## Native Cube and LIBERO evaluation
 
@@ -136,11 +135,10 @@ python -m fcp.closed_loop.libero --environment scene2 --variant true \
 
 Use `--environment caddy` with the Caddy archive. Use `--trials 1` to check one query. At each decision the matched prior proposes 64 plans, including its top mode. The frozen two-view lower model scores the plans once. Native success stops execution immediately. The 150-query summaries report success and the sample standard deviation over three groups of 50. The native PushT, Cube, and LIBERO commands take `--checkpoint` and `--prior-root` to evaluate a locally trained pair and its matching prior. [Fixed Scene2 and Caddy query manifests](fcp/closed_loop/libero_tasks.json)
 
-In the release check, the ten Cube H25 tasks in the first seed-22 batch matched the archived first-hit steps. The tested Scene2 and Caddy queries matched their archived outcomes and execution lengths. Their action traces diverged after the first segment. The release check covered one LIBERO query per suite.
 
 ## Navigation weights and evaluation
 
-The released AntMaze and FourRoom checkpoints are paired with individually retrained SAGE Transformer-GMM priors from November 22. The table gives the verified CEM results for those exact priors: AntMaze uses its archived CEM run, and FourRoom uses the November 23 CEM rerun. Both use 300 candidates, 30 rounds, and 30 elites; no prior was retrained for this solver comparison.
+AntMaze and FourRoom use the matched SAGE Transformer-GMM action priors and CEM with 300 candidates, 30 rounds, and 30 elites. Use the evaluation settings in `fcp/selected_models.json`.
 
 | Variant | AntMaze D3 | FourRoom H75 | FourRoom H100 | FourRoom H125 |
 |---|---:|---:|---:|---:|
@@ -160,5 +158,3 @@ The backend factory receives `(environment, variant, backend_config, device)` an
 - `propose(target, goal, horizon, count, terminal, rng)` for the matching prior's candidate actions in planner coordinates. Include the prior mode among the LIBERO candidates.
 - `rollout(actions)` for the frozen world model's terminal latent per candidate. FourRoom uses bounded CEM: the backend must implement `bound_actions(actions)` to clamp every candidate in planner coordinates to the normalized equivalent of physical actions in `[-1,1]`. Preserve the native cost (including its last-two-prediction reduction and configured intermediate weight) through `cost(actions, target)`. AntMaze keeps its original action-space handling.
 - `actions_for_execution(actions)` to convert the chosen action segment to the simulator's coordinates, followed by `step(action)` for the success and termination flags.
-
-The GitHub `fcp/selected_models.json` is authoritative for the selected evaluation protocol. The pinned Hugging Face files retain their historical export metadata; the FourRoom solver override changes no model tensor or normalization statistic. See [verified CEM results](results/navigation_cem/README.md).
